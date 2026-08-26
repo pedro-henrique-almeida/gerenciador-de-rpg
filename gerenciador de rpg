@@ -1,0 +1,1247 @@
+"""
+Sistema de Gerenciamento de RPG
+Versão com inventário, troca de armas e menu integrado
+"""
+
+from builtins import ValueError, input, int, print
+import random
+
+
+# ========== FUNÇÃO AUXILIAR ==========
+def dado(lados):
+    return random.randint(1, lados)
+
+
+# ========== ITENS ==========
+espada = {
+    "nome": "espada comum",
+    "dano": 10,
+    "descriçao": "uma espada de ferro comum, essencial em aventuras",
+}
+
+flecha_madeira = {
+    "nome": "flecha de madeira",
+    "quantidade": 10,
+    "dano": 2,
+    "descriçao": "uma flecha de madeira simples, usada com arcos",
+}
+
+arco_madeira = {
+    "nome": "arco de madeira simples",
+    "dano": 5,
+    "flecha de madeira": 5,
+    "descriçao": "um arco de madeira simples, adequado para ataques a longa distancia",
+}
+
+machado = {
+    "nome": "machado de batalha",
+    "dano": 12,
+    "descriçao": "um machado de batalha pesado, ideal para combates corpo a corpo",
+}
+
+katana = {
+    "nome": "katana afiada",
+    "dano": 15,
+    "descriçao": "uma katana afiada, perfeita para ataques rápidos e precisos",
+}
+
+lança = {
+    "nome": "lança longa",
+    "dano": 8,
+    "descriçao": "uma lança longa, usada para ataques a longa distância",
+}
+
+corda = {
+    "nome": "corda resistente",
+    "dano": 0,
+    "descriçao": "uma corda resistente, útil para escaladas e amarrações",
+}
+
+adaga = {
+    "nome": "adaga pequena",
+    "dano": 4,
+    "descriçao": "uma adaga pequena, ideal para ataques furtivos",
+}
+
+besta = {
+    "nome": "besta pesada",
+    "dano": 12,
+    "descriçao": "uma besta pesada, capaz de disparar projéteis com grande força",
+}
+
+maos = {
+    "nome": "mãos",
+    "dano": 6,
+    "descriçao": "esmurra seus oponentes",
+}
+
+# Lista global de todos os itens disponíveis
+itens = [
+    espada,
+    flecha_madeira,
+    arco_madeira,
+    machado,
+    katana,
+    lança,
+    corda,
+    adaga,
+    besta,
+    maos,
+]
+
+# ========== FUNÇÕES DE ITENS ==========
+
+
+def novo_item():
+    print("=== CRIE SEU ITEM ===")
+    nome = input("escolha o nome: ")
+    try:
+        dano = int(input("escolha o dano: "))
+    except ValueError:
+        print("Dano deve ser um número. Usando 0.")
+        dano = 0
+    descriçao = input("escolha a descriçao: ")
+    item_novo = {
+        "nome": nome,
+        "dano": dano,
+        "descriçao": descriçao,
+    }
+    itens.append(item_novo)
+    print("Item adicionado com sucesso!")
+
+
+def listar_itens():
+    print("== Lista de Itens ==")
+    for numero, arma in enumerate(itens, start=1):
+        print(numero, "-", arma["nome"])
+    while True:
+        try:
+            escolha = int(input("Escolha um item (0 para sair): "))
+        except ValueError:
+            print("Digite um número.")
+            continue
+        if escolha == 0:
+            break
+        try:
+            item = itens[escolha - 1]
+        except IndexError:
+            print("Opção inválida.")
+            continue
+        for chave, valor in item.items():
+            print(chave, ":", valor)
+        input("\nPressione ENTER para continuar...")
+
+
+def remover_item():
+    print("=== REMOVER ITEM ===")
+    if not itens:
+        print("Nenhum item para remover.")
+        return
+    for numero, arma in enumerate(itens, start=1):
+        print(numero, "-", arma["nome"])
+    print("0 - Cancelar")
+    try:
+        escolha = int(input("Número do item a remover: "))
+    except ValueError:
+        print("Digite um número.")
+        return
+    if escolha == 0:
+        print("Operação cancelada.")
+        return
+    try:
+        item = itens[escolha - 1]
+    except IndexError:
+        print("Opção inválida.")
+        return
+    nome = item["nome"]
+    confirm = input(f"Remover '{nome}'? (s/N): ")
+    if confirm.lower() == "s":
+        itens.pop(escolha - 1)
+        print("Item removido.")
+    else:
+        print("Remoção cancelada.")
+
+
+# ========== PLAYERS ==========
+
+kai = {
+    "nome": "Kai",
+    "nivel": 1,
+    "vida": 80,
+    "mana": 10,
+    "classe": "Guerreiro",
+    "arma": espada,
+    "inventario": [machado, lança, maos],
+    "atributos": {
+        "força": 4,
+        "agilidade": 2,
+        "inteligencia": 4,
+        "carisma": 1,
+    },
+}
+
+any = {
+    "nome": "any",
+    "nivel": 1,
+    "vida": 50,
+    "mana": 50,
+    "arma": arco_madeira,
+    "classe": "arqueira",
+    "inventario": [flecha_madeira, besta, maos],
+    "atributos": {
+        "força": 2,
+        "agilidade": 4,
+        "inteligencia": 3,
+        "carisma": 2,
+    },
+}
+
+lee = {
+    "nome": "lee",
+    "nivel": 1,
+    "vida": 40,
+    "mana": 20,
+    "arma": katana,
+    "classe": "espadachim",
+    "inventario": [adaga, corda, maos],
+    "atributos": {
+        "força": 3,
+        "agilidade": 4,
+        "inteligencia": 2,
+        "carisma": 1,
+    },
+}
+
+ficha_player = [kai, any, lee]
+
+# ========== FUNÇÕES DE PLAYERS ==========
+
+
+def novo_jogador():
+    print("=== CRIE SEU PERSONAGEM ===")
+    nome = input("informe o nome: ")
+    try:
+        vida = int(input("informe a vida: "))
+    except ValueError:
+        print("Vida deve ser número. Usando 50.")
+        vida = 50
+    try:
+        mana = int(input("informe a mana: "))
+    except ValueError:
+        print("Mana deve ser número. Usando 10.")
+        mana = 10
+    classe = input("informe a classe: ")
+
+    print("== Lista de Itens ==")
+    for numero, arma in enumerate(itens, start=1):
+        print(numero, "-", arma["nome"])
+
+    while True:
+        try:
+            escolha = int(input("Escolha o número da arma inicial: "))
+        except ValueError:
+            print("Digite um número.")
+            continue
+        try:
+            arma = itens[escolha - 1]
+            break
+        except IndexError:
+            print("Opção inválida.")
+
+    print("==== ESCOLHA SEUS ATRIBUTOS ====")
+    pontos = 14
+
+    while True:
+        try:
+            força = int(input("Informe sua força: "))
+        except ValueError:
+            print("Digite um número.")
+            continue
+        if força <= pontos:
+            pontos -= força
+            break
+        print("Você não possui essa quantidade de pontos.")
+    print("Pontos restantes:", pontos)
+
+    while True:
+        try:
+            agilidade = int(input("Informe sua agilidade: "))
+        except ValueError:
+            print("Digite um número.")
+            continue
+        if agilidade <= pontos:
+            pontos -= agilidade
+            break
+        print("Você não possui essa quantidade de pontos.")
+    print("Pontos restantes:", pontos)
+
+    while True:
+        try:
+            inteligencia = int(input("Informe sua inteligência: "))
+        except ValueError:
+            print("Digite um número.")
+            continue
+        if inteligencia <= pontos:
+            pontos -= inteligencia
+            break
+        print("Você não possui essa quantidade de pontos.")
+    print("Pontos restantes:", pontos)
+
+    while True:
+        try:
+            carisma = int(input("Informe seu carisma: "))
+        except ValueError:
+            print("Digite um número.")
+            continue
+        if carisma <= pontos:
+            pontos -= carisma
+            break
+        print("Você não possui essa quantidade de pontos.")
+    print("Pontos restantes:", pontos)
+
+    atributos = {
+        "força": força,
+        "agilidade": agilidade,
+        "inteligencia": inteligencia,
+        "carisma": carisma,
+    }
+
+    novo_player = {
+        "nome": nome,
+        "vida": vida,
+        "mana": mana,
+        "classe": classe,
+        "arma": arma,
+        "inventario": [arma],  # começa com a arma escolhida
+        "atributos": atributos,
+    }
+    ficha_player.append(novo_player)
+    print("Personagem criado com sucesso!")
+
+
+def remover_jogador():
+    print("=== REMOVER PLAYER ===")
+    if not ficha_player:
+        print("Nenhum player para remover.")
+        return
+    for numero, jogador in enumerate(ficha_player, start=1):
+        print(numero, "-", jogador["nome"])
+    print("0 - Cancelar")
+    try:
+        escolha = int(input("Número do player a remover: "))
+    except ValueError:
+        print("Digite um número.")
+        return
+    if escolha == 0:
+        print("Operação cancelada.")
+        return
+    try:
+        jogador = ficha_player[escolha - 1]
+    except IndexError:
+        print("Opção inválida.")
+        return
+    nome = jogador["nome"]
+    confirm = input(f"Remover '{nome}'? (s/N): ")
+    if confirm.lower() == "s":
+        ficha_player.pop(escolha - 1)
+        print("Player removido.")
+    else:
+        print("Remoção cancelada.")
+
+
+# ========== GERENCIAMENTO DE INVENTÁRIO ==========
+
+
+def equipar_arma(jogador):
+    """Troca a arma equipada do jogador por uma do inventário."""
+    print("\n=== EQUIPAR ARMA ===")
+    print("Arma atual:", jogador["arma"]["nome"])
+    if not jogador["inventario"]:
+        print("Inventário vazio. Não é possível equipar nada.")
+        return
+    print("Itens no inventário:")
+    for numero, item in enumerate(jogador["inventario"], start=1):
+        print(numero, "-", item["nome"], "(dano:", item["dano"], ")")
+    print("0 - Cancelar")
+    try:
+        escolha = int(input("Escolha o número do item para equipar: "))
+    except ValueError:
+        print("Digite um número.")
+        return
+    if escolha == 0:
+        return
+    try:
+        nova_arma = jogador["inventario"][escolha - 1]
+    except IndexError:
+        print("Opção inválida.")
+        return
+    # Se a arma atual não estiver no inventário, adiciona
+    if jogador["arma"] not in jogador["inventario"]:
+        jogador["inventario"].append(jogador["arma"])
+    # Remove a nova arma do inventário
+    jogador["inventario"].pop(escolha - 1)
+    # Equipa a nova arma
+    jogador["arma"] = nova_arma
+    print(f"{jogador['nome']} agora está equipado com {nova_arma['nome']}.")
+
+
+def adicionar_item_ao_inventario(jogador):
+    """Adiciona um item da lista global ao inventário do jogador."""
+    print("\n=== ADICIONAR ITEM AO INVENTÁRIO ===")
+    print("Itens disponíveis:")
+    for numero, item in enumerate(itens, start=1):
+        print(numero, "-", item["nome"], "(dano:", item["dano"], ")")
+    print("0 - Cancelar")
+    try:
+        escolha = int(input("Escolha o número do item: "))
+    except ValueError:
+        print("Digite um número.")
+        return
+    if escolha == 0:
+        return
+    try:
+        item = itens[escolha - 1]
+    except IndexError:
+        print("Opção inválida.")
+        return
+    # Verifica se o item já está no inventário (opcional)
+    if item in jogador["inventario"]:
+        print("Este item já está no inventário.")
+        return
+    jogador["inventario"].append(item)
+    print(f"{item['nome']} adicionado ao inventário de {jogador['nome']}.")
+
+
+def remover_item_do_inventario(jogador):
+    """Remove um item do inventário do jogador."""
+    print("\n=== REMOVER ITEM DO INVENTÁRIO ===")
+    if not jogador["inventario"]:
+        print("Inventário vazio.")
+        return
+    print("Itens no inventário:")
+    for numero, item in enumerate(jogador["inventario"], start=1):
+        print(numero, "-", item["nome"], "(dano:", item["dano"], ")")
+    print("0 - Cancelar")
+    try:
+        escolha = int(input("Escolha o número do item a remover: "))
+    except ValueError:
+        print("Digite um número.")
+        return
+    if escolha == 0:
+        return
+    try:
+        item = jogador["inventario"][escolha - 1]
+    except IndexError:
+        print("Opção inválida.")
+        return
+    # Não permite remover a arma equipada
+    if item is jogador["arma"]:
+        print("Não é possível remover a arma equipada. Equipe outra arma primeiro.")
+        return
+    jogador["inventario"].pop(escolha - 1)
+    print(f"{item['nome']} removido do inventário.")
+
+
+# ========== EXIBIÇÃO DETALHADA DO PLAYER ==========
+
+
+def exibir_player_completo(jogador):
+    """Mostra todas as informações do jogador e oferece opções de gerenciamento."""
+    while True:
+        print("\n" + "=" * 50)
+        print("PLAYER:", jogador["nome"])
+        print("=" * 50)
+        print("Nível:", jogador["nivel"])
+        print("Vida:", jogador["vida"])
+        print("Mana:", jogador["mana"])
+        print("Classe:", jogador["classe"])
+        print(
+            "Arma equipada:",
+            jogador["arma"]["nome"],
+            "(dano:",
+            jogador["arma"]["dano"],
+            ")",
+        )
+        print("\nATRIBUTOS:")
+        for attr, val in jogador["atributos"].items():
+            print("  ", attr.capitalize(), ":", val)
+        print("\nINVENTÁRIO:")
+        if jogador["inventario"]:
+            for i, item in enumerate(jogador["inventario"], start=1):
+                print("  ", i, "-", item["nome"], "(dano:", item["dano"], ")")
+        else:
+            print("  (vazio)")
+        print("\n--- OPÇÕES ---")
+        print("1 - Equipar arma")
+        print("2 - Adicionar item ao inventário")
+        print("3 - Remover item do inventário")
+        print("4 - Recuperar vida")
+        print("0 - Voltar")
+
+        try:
+            escolha = int(input("Escolha: "))
+        except ValueError:
+            print("Digite um número.")
+            continue
+
+        if escolha == 0:
+            break
+        elif escolha == 1:
+            equipar_arma(jogador)
+        elif escolha == 2:
+            adicionar_item_ao_inventario(jogador)
+        elif escolha == 3:
+            remover_item_do_inventario(jogador)
+
+        elif escolha == 4:
+            recuperar_vida(jogador)
+        else:
+            print("Opção inválida.")
+        input("\nPressione ENTER para continuar...")
+
+        def recuperar_vida(jogador):
+
+            print("\n=== RECUPERAR VIDA ===")
+            vida = int(input("Informe a quantidade de vida a recuperar: "))
+
+            jogador["vida"] += vida
+            print(f"{jogador['nome']} recuperou {vida} de vida.")
+            print(f"\nVida atual: {jogador['vida']}")
+
+
+# ========== LISTAGEM DE PLAYERS ==========
+
+
+def listar_players():
+    """Mostra a lista de players e permite selecionar um para gerenciar."""
+    while True:
+        print("\n=== LISTA DE PLAYERS ===")
+        for numero, jogador in enumerate(ficha_player, start=1):
+            print(numero, "-", jogador["nome"], "(classe:", jogador["classe"], ")")
+        print("0 - Voltar")
+        try:
+            escolha = int(
+                input("Escolha um player para gerenciar (ou 0 para voltar): ")
+            )
+        except ValueError:
+            print("Digite um número.")
+            continue
+        if escolha == 0:
+            break
+        try:
+            jogador = ficha_player[escolha - 1]
+        except IndexError:
+            print("Opção inválida.")
+            continue
+        exibir_player_completo(jogador)
+
+
+# ========== CRIATURAS ==========
+
+
+class npc:
+    def __init__(self, nome, vida, mana, classe, arma, inventario, atributos):
+        self.nome = nome
+        self.vida = vida
+        self.mana = mana
+        self.classe = classe
+        self.arma = arma
+        self.inventario = inventario
+        self.atributos = atributos
+
+    def __getitem__(self, chave):
+        return getattr(self, chave)
+
+
+orc = npc(
+    "Orc",
+    50,
+    10,
+    "Guerreiro",
+    {"nome": "Machado", "dano": 15},
+    [{"nome": "Machado", "dano": 15}],
+    {"força": 15, "agilidade": 6, "inteligencia": 3, "carisma": 2},
+)
+
+goblin = npc(
+    "Goblin",
+    30,
+    20,
+    "Ladino",
+    {"nome": "Adaga", "dano": 8},
+    [{"nome": "Adaga", "dano": 8}],
+    {"força": 5, "agilidade": 14, "inteligencia": 7, "carisma": 4},
+)
+
+cavaleiro = npc(
+    "Cavaleiro",
+    80,
+    5,
+    "Paladino",
+    {"nome": "Espada", "dano": 12},
+    [{"nome": "Espada", "dano": 12}, {"nome": "Escudo", "defesa": 10}],
+    {"força": 14, "agilidade": 7, "inteligencia": 8, "carisma": 12},
+)
+
+mago = npc(
+    "Mago",
+    35,
+    60,
+    "Mago",
+    {"nome": "Cajado", "dano": 10},
+    [{"nome": "Cajado", "dano": 10}, {"nome": "Poção", "cura": 20}],
+    {"força": 3, "agilidade": 6, "inteligencia": 18, "carisma": 10},
+)
+
+
+criaturas = [orc, goblin, cavaleiro, mago]
+
+
+def monstros():
+    while True:
+        print("==== MONSTROS ====")
+
+        for i, criatura in enumerate(criaturas, start=1):
+            print(f"{i}. {criatura.nome}")
+
+        print("0. Voltar")
+
+        try:
+            escolha = int(input("Escolha o monstro: "))
+        except ValueError:
+            print("Digite um número.")
+            continue
+
+        if escolha == 0:
+            break
+
+        try:
+            mob = criaturas[escolha - 1]
+        except IndexError:
+            print("Opção inválida.")
+            continue
+
+        print(f"\n=== {mob.nome.upper()} ===")
+
+        for chave, valor in mob.__dict__.items():
+
+            if chave == "arma":
+                print("Arma:", valor["nome"])
+
+            elif chave == "inventario":
+                print("Inventário:", end=" ")
+
+                for item in valor:
+                    print(item["nome"], end=", ")
+
+                print()
+
+            elif chave == "atributos":
+                print("Atributos:")
+
+                for atributo, valor_atributo in valor.items():
+                    print(f"  {atributo.capitalize()}: {valor_atributo}")
+
+            else:
+                print(f"{chave.capitalize()}: {valor}")
+
+        input("\nPressione ENTER para continuar...")
+
+
+# CRIAR NPC NO GERAL
+
+
+def novo_npc():
+    print("=== CRIE SEU NPC ===")
+    nome = input("informe o nome: ")
+    try:
+        vida = int(input("informe a vida: "))
+    except ValueError:
+        print("Vida deve ser número. Usando 50.")
+        vida = 50
+    try:
+        mana = int(input("informe a mana: "))
+    except ValueError:
+        print("Mana deve ser número. Usando 10.")
+        mana = 10
+    classe = input("informe a classe: ")
+
+    print("== Lista de Itens ==")
+    for numero, arma in enumerate(itens, start=1):
+        print(numero, "-", arma["nome"])
+
+    while True:
+        try:
+            escolha = int(input("Escolha o número da arma inicial: "))
+        except ValueError:
+            print("Digite um número.")
+            continue
+        try:
+            arma = itens[escolha - 1]
+            break
+        except IndexError:
+            print("Opção inválida.")
+
+    print("==== ESCOLHA SEUS ATRIBUTOS ====")
+    pontos = int(input("Informe a quantidade de pontos para distribuir: "))
+
+    while True:
+        try:
+            força = int(input("Informe sua força: "))
+        except ValueError:
+            print("Digite um número.")
+            continue
+        if força <= pontos:
+            pontos -= força
+            break
+        print("Você não possui essa quantidade de pontos.")
+    print("Pontos restantes:", pontos)
+
+    while True:
+        try:
+            agilidade = int(input("Informe sua agilidade: "))
+        except ValueError:
+            print("Digite um número.")
+            continue
+        if agilidade <= pontos:
+            pontos -= agilidade
+            break
+        print("Você não possui essa quantidade de pontos.")
+    print("Pontos restantes:", pontos)
+
+    while True:
+        try:
+            inteligencia = int(input("Informe sua inteligência: "))
+        except ValueError:
+            print("Digite um número.")
+            continue
+        if inteligencia <= pontos:
+            pontos -= inteligencia
+            break
+        print("Você não possui essa quantidade de pontos.")
+    print("Pontos restantes:", pontos)
+
+    while True:
+        try:
+            carisma = int(input("Informe seu carisma: "))
+        except ValueError:
+            print("Digite um número.")
+            continue
+        if carisma <= pontos:
+            pontos -= carisma
+            break
+        print("Você não possui essa quantidade de pontos.")
+    print("Pontos restantes:", pontos)
+
+    atributos = {
+        "força": força,
+        "agilidade": agilidade,
+        "inteligencia": inteligencia,
+        "carisma": carisma,
+    }
+
+    npc_novo = npc(nome, vida, mana, classe, arma, [arma], atributos)
+
+    criaturas.append(npc_novo)
+    print("npc criado com sucesso!")
+
+
+# ========== COMBATE ==========
+
+
+def criar_cenario():  # em produçao
+
+    participantes = []  # armanzena quem esta no comabate
+
+    nome = input("Digite o nome do local: ")
+
+    integrantes = ficha_player + criaturas
+
+    for numero, integrante in enumerate(integrantes, start=1):
+        print("  [", numero, "] ", integrante["nome"], sep="")
+
+    while True:
+        try:
+            participante = int(
+                input("Escolha o número dos participantes (0 para encerrar): ")
+            )
+        except ValueError:
+            print("Digite um número.")
+            continue
+
+        if participante == 0:
+            break
+
+        try:
+            participante = integrantes[participante - 1]
+        except IndexError:
+            print("Opção inválida.")
+            continue
+
+        participantes.append(participante)
+
+        print(f"{participante['nome']} adicionado ao combate.")
+
+    cenario = {
+        "nome": nome,
+        "participantes": participantes,
+    }
+
+    cenarios.append(cenario)
+
+
+cenarios = []  # armazena o nome do local e os participantes
+
+
+def exibir_cenarios():
+    if not cenarios:
+        print("Nenhum cenário criado.")
+        return
+
+    print("\n=== CENÁRIOS ===")
+    for numero, cenario in enumerate(cenarios, start=1):
+        print(f"{numero}. {cenario['nome']}")
+
+        print("   Participantes:")
+
+        for participante in cenario["participantes"]:
+
+            print(f"     - {participante['nome']}")
+    input("\nPressione ENTER para continuar...")
+
+
+def escolher_cenario():
+    if not cenarios:
+        print("Nenhum cenário criado.")
+        return None
+
+    print("\n=== ESCOLHER CENÁRIO ===")
+
+    for numero, cenario in enumerate(cenarios, start=1):
+        print(f"{numero}. {cenario['nome']}")
+
+    while True:
+        try:
+            escolha = int(input("Escolha o número do cenário (0 para cancelar): "))
+        except ValueError:
+            print("Digite um número.")
+            continue
+
+        if escolha == 0:
+            return None
+
+        try:
+            cenario = cenarios[escolha - 1]
+            return cenario
+        except IndexError:
+            print("Opção inválida.")
+
+
+def ataque(atacante, alvo):
+    rolagem = dado(20)
+    bonus_agilidade = atacante["atributos"]["agilidade"]
+    teste = rolagem + bonus_agilidade
+
+    print("\n" + "=" * 50)
+    print(atacante["nome"].upper(), "ATACA", alvo["nome"].upper())
+    print("=" * 50)
+    print("\n--- ROLAGEM DE ATAQUE ---")
+    print("D20:", rolagem)
+    print("Bonus de Agilidade: +", bonus_agilidade)
+    print("Total do teste:", teste)
+
+    while True:
+        print("\n" + "-" * 40)
+        print("O MESTRE DECIDE:")
+        print("   [S] - Acertou")
+        print("   [N] - Errou")
+        print("   [0] - Encerrar combate (Hit Kill)")
+        decisao = input("Sua decisao: ").strip().upper()
+
+        if decisao == "S":
+            dano_arma = atacante["arma"]["dano"]
+            dano_força = atacante["atributos"]["força"]
+            dano_total = dano_arma + dano_força
+
+            vida_restante = alvo["vida"] - dano_total
+
+            print("\n" + "=" * 50)
+            print(atacante["nome"], "ACERTOU", alvo["nome"], "!")
+            print("=" * 50)
+            print("\n--- CALCULO DO DANO ---")
+            print("Dano da arma (", atacante["arma"]["nome"], "):", dano_arma)
+            print("Bonus de Forca: +", dano_força)
+            print("Dano total:", dano_total)
+
+            if vida_restante <= 0:
+                print("\n" + "=" * 50)
+                print(alvo["nome"].upper(), "FOI ELIMINADO!")
+                print("=" * 50)
+                alvo["vida"] = alvo["vida_maxima"]
+
+                return True
+            else:
+                alvo["vida"] = vida_restante
+                print("\n--- VIDA RESTANTE ---")
+                print(alvo["nome"], "agora tem", vida_restante, "de vida")
+                return False
+
+        elif decisao == "N":
+            print("\n" + "=" * 40)
+            print(atacante["nome"], "ERROU o ataque!")
+            print("=" * 40)
+            return False
+
+        elif decisao == "0":
+            print("\n" + "=" * 50)
+            print("HIT KILL! COMBATE ENCERRADO PELO MESTRE")
+            print("=" * 50)
+            alvo["vida"] = alvo["vida_maxima"]
+            print("Vida do alvo restaurada para", alvo["vida_maxima"])
+            return True
+
+        else:
+            print("Resposta invalida. Digite S, N ou 0.")
+
+
+menus_de_combate_com_alvo = [
+    criar_cenario,
+    exibir_cenarios,
+    escolher_cenario,
+]
+
+
+def menu_combate_cenarios():
+
+    print("\n" + "=" * 50)
+    print("MENU DE COMBATE")
+    print("=" * 50)
+
+    for numero, opcao in enumerate(menus_de_combate_com_alvo, start=1):
+        print(
+            "  [", numero, "] ", opcao.__name__.replace("_", " ").capitalize(), sep=""
+        )
+
+    while True:
+
+        try:
+            escolha = int(input("Escolha uma opção (0 para voltar): "))
+        except ValueError:
+            print("Digite um número.")
+            continue
+
+        if escolha == 0:
+            break
+
+        try:
+            combate_atual = menus_de_combate_com_alvo[escolha - 1]()
+        except IndexError:
+            print("Opção inválida.")
+            continue
+
+        if combate_atual:
+            participantes = combate_atual["participantes"]
+            combate_com_alvo(participantes)
+
+
+def combate_com_alvo(participantes):
+
+    print("\n" + "=" * 50)
+    print("INICIANDO COMBATE")
+    print("=" * 50)
+
+    print("\n--- ESCOLHA O ATACANTE ---")
+    for numero, jogador in enumerate(participantes, start=1):
+        print("  [", numero, "] ", jogador["nome"], sep="")
+
+    try:
+        escolha_atacante = int(input("Numero do atacante: "))
+    except ValueError:
+        print("Digite um numero.")
+        return
+
+    try:
+        atacante = participantes[escolha_atacante - 1]
+    except IndexError:
+        print("Opcao invalida.")
+        return
+
+    print("\n--- ESCOLHA O ALVO ---")
+    for numero, criatura in enumerate(participantes, start=1):
+        print(
+            "  [",
+            numero,
+            "] ",
+            criatura["nome"],
+            " (Vida: ",
+            criatura["vida"],
+            ")",
+            sep="",
+        )
+
+    try:
+        escolha_alvo = int(input("Numero do alvo: "))
+    except ValueError:
+        print("Digite um numero.")
+        return
+
+    try:
+        alvo = participantes[escolha_alvo - 1]
+    except IndexError:
+        print("Opcao invalida.")
+        return
+
+    while True:
+        print("\n" + "-" * 40)
+        print("VIDA ATUAL DO ALVO:", alvo["nome"], "=", alvo["vida"])
+        print("-" * 40)
+
+        combate_terminou = ataque(atacante, alvo)
+        if combate_terminou:
+            print("\n" + "=" * 50)
+            print("COMBATE ENCERRADO")
+            print("=" * 50)
+            input("\nPressione ENTER para voltar ao menu...")
+            break
+
+        print("\n" + "-" * 40)
+        print("NOVO ATAQUE")
+        print("-" * 40)
+
+        print("--- ESCOLHA O ATACANTE ---")
+        for numero, jogador in enumerate(participantes, start=1):
+            print("  [", numero, "] ", jogador["nome"], sep="")
+        print("  [0] Encerrar combate")
+
+        try:
+            escolha = int(input("Numero do atacante (0 para encerrar): "))
+        except ValueError:
+            print("Digite um numero.")
+            continue
+
+        if escolha == 0:
+            print("\n" + "=" * 40)
+            print("Combate encerrado pelo mestre.")
+            print("=" * 40)
+            alvo["vida"] = alvo["vida_maxima"]
+            print("Vida do alvo restaurada para", alvo["vida_maxima"])
+            input("\nPressione ENTER para voltar ao menu...")
+            break
+
+        try:
+            atacante = participantes[escolha - 1]
+        except IndexError:
+            print("Opcao invalida. Tente novamente.")
+            continue
+
+
+def combate_livre():
+    print("\n" + "=" * 40)
+    print("COMBATE LIVRE")
+    print("=" * 40)
+    print("\n--- ESCOLHA O ATACANTE ---")
+    for numero, jogador in enumerate(ficha_player, start=1):
+        print("  [", numero, "] ", jogador["nome"], sep="")
+
+    try:
+        escolha = int(input("Numero do atacante: "))
+    except ValueError:
+        print("Digite um numero.")
+        return
+
+    try:
+        atacante = ficha_player[escolha - 1]
+    except IndexError:
+        print("Opcao invalida.")
+        return
+
+    rolagem = dado(20)
+    bonus_agilidade = atacante["atributos"]["agilidade"]
+    teste = rolagem + bonus_agilidade
+    dano_arma = atacante["arma"]["dano"]
+    dano_força = atacante["atributos"]["força"]
+    dano_total = dano_arma + dano_força
+
+    print("\n" + "=" * 40)
+    print(atacante["nome"].upper(), "ATACA!")
+    print("=" * 40)
+    print("\n--- ROLAGEM DE ATAQUE ---")
+    print("D20:", rolagem)
+
+    print("Bonus de Agilidade: +", bonus_agilidade)
+    print("Total do teste:", teste)
+    print("\n--- DANO POTENCIAL ---")
+    print("Dano da arma (", atacante["arma"]["nome"], "):", dano_arma)
+    print("Bonus de Forca: +", dano_força)
+    print("Dano total:", dano_total)
+    input("\nPressione ENTER para continuar...")
+
+
+def rolagem_livre():
+    print("\n" + "=" * 40)
+    print("ROLAGEM LIVRE")
+    print("=" * 40)
+    print("\n--- ESCOLHA O PLAYER ---")
+    for numero, jogador in enumerate(ficha_player, start=1):
+        print("  [", numero, "] ", jogador["nome"], sep="")
+
+    try:
+        escolha = int(input("Numero do player: "))
+    except ValueError:
+        print("Digite um numero.")
+        return
+
+    try:
+        jogador = ficha_player[escolha - 1]
+    except IndexError:
+        print("Opcao invalida.")
+        return
+
+    print("\n--- ATRIBUTOS DISPONIVEIS ---")
+    lista_atributos = ["força", "agilidade", "inteligencia", "carisma"]
+    for i, atributo in enumerate(lista_atributos, start=1):
+        print(
+            "  [",
+            i,
+            "] ",
+            atributo.capitalize(),
+            " (valor: ",
+            jogador["atributos"][atributo],
+            ")",
+            sep="",
+        )
+    print("  [0] Cancelar")
+
+    try:
+        escolha_attr = int(input("Escolha o atributo: "))
+    except ValueError:
+        print("Digite um numero.")
+        return
+
+    if escolha_attr == 0:
+        return
+
+    try:
+        atributo_escolhido = lista_atributos[escolha_attr - 1]
+    except IndexError:
+        print("Opcao invalida.")
+        return
+
+    valor_atributo = jogador["atributos"][atributo_escolhido]
+    rolagem = dado(20)
+    resultado = rolagem + valor_atributo
+
+    print("\n" + "=" * 40)
+    print("TESTE DE", atributo_escolhido.upper())
+    print("=" * 40)
+    print("D20:", rolagem)
+    print("Bonus: +", valor_atributo)
+    print("Resultado:", resultado)
+    input("\nPressione ENTER para continuar...")
+
+
+# ========== MENUS ==========
+
+
+def menu_players():
+    while True:
+        print("\n=== MENU PLAYERS ===")
+        print("1 - Listar Players")
+        print("2 - Adicionar Player")
+        print("3 - Remover Player")
+        print("0 - Voltar")
+        try:
+            opcao = int(input("Escolha: "))
+        except ValueError:
+            print("Digite um numero.")
+            continue
+        if opcao == 0:
+            break
+        elif opcao == 1:
+            listar_players()
+        elif opcao == 2:
+            novo_jogador()
+        elif opcao == 3:
+            remover_jogador()
+        else:
+            print("Opcao invalida.")
+
+
+def menu_itens():
+    while True:
+        print("\n=== MENU ITENS ===")
+        print("1 - Listar Itens")
+        print("2 - Adicionar Item")
+        print("3 - Remover Item")
+        print("0 - Voltar")
+        try:
+            opcao = int(input("Escolha: "))
+        except ValueError:
+            print("Digite um numero.")
+            continue
+        if opcao == 0:
+            break
+        elif opcao == 1:
+            listar_itens()
+        elif opcao == 2:
+            novo_item()
+        elif opcao == 3:
+            remover_item()
+        else:
+            print("Opcao invalida.")
+
+
+def menu_combate():
+    while True:
+        print("\n=== MENU COMBATE ===")
+        print("1 - Combate com alvo (contra criatura)")
+        print("2 - Combate livre (sem alvo)")
+        print("3 - Rolagem livre (teste de atributo)")
+        print("0 - Voltar")
+        try:
+            opcao = int(input("Escolha: "))
+        except ValueError:
+            print("Digite um numero.")
+            continue
+        if opcao == 0:
+            break
+        elif opcao == 1:
+            combate_com_alvo()
+        elif opcao == 2:
+            combate_livre()
+        elif opcao == 3:
+            rolagem_livre()
+        else:
+            print("Opcao invalida.")
+
+
+def menu():
+    while True:
+        print("\n=== SISTEMA DE GERENCIAMENTO RPG ===")
+        print("1 - Players")
+        print("2 - Itens")
+        print("3 - Combate")
+        print("4 - NPCs")
+        print("0 - Sair")
+        try:
+            opcao = int(input("Escolha: "))
+        except ValueError:
+            print("Digite um numero.")
+            continue
+        if opcao == 0:
+            print("Saindo...")
+            break
+        elif opcao == 1:
+            menu_players()
+        elif opcao == 2:
+            menu_itens()
+        elif opcao == 3:
+            menu_combate()
+        elif opcao == 4:
+            novo_npc()
+        else:
+            print("Opcao invalida.")
+
+
+# ========== EXECUTA ==========
+menu_combate_cenarios()
