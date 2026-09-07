@@ -6,6 +6,7 @@ Versão com inventário, troca de armas e menu integrado
 from builtins import ValueError, input, int, print
 import random
 
+from copy import deepcopy
 
 # ========== FUNÇÃO AUXILIAR ==========
 def dado(lados):
@@ -540,6 +541,7 @@ def listar_players():
 class npc:
     def __init__(self, nome, vida, mana, classe, arma, inventario, atributos):
         self.nome = nome
+        self.tipo = nome
         self.vida = vida
         self.vida_maxima = vida
         self.mana = mana
@@ -745,51 +747,105 @@ def novo_npc():
     print("npc criado com sucesso!")
 
 
+
+
+
+def selecionar_npc(participantes):
+
+    print("\nEscolha a criatura:")
+
+    for numero, criatura in enumerate(criaturas, start=1):
+        print(numero, "-", criatura.nome)
+
+    escolha = int(input("Escolha: "))
+
+    classe_escolhida = criaturas[escolha - 1]
+
+    quantidade = 0
+
+    for criatura in participantes:
+        if criatura.tipo == classe_escolhida.tipo:
+            quantidade += 1
+
+    if isinstance(classe_escolhida, npc):
+        nova_criatura = deepcopy(classe_escolhida)
+
+        nova_criatura.nome = nova_criatura.tipo + str(quantidade + 1)
+
+        participantes.append(nova_criatura)
+
+        print(nova_criatura.nome, "adicionado ao combate!")
 # ========== COMBATE ==========
 
+cenarios = []
 
-def criar_cenario():  # em produçao
+def criar_cenario():
 
-    participantes = []  # armanzena quem esta no comabate
+    participantes = []
 
     nome = input("Digite o nome do local: ")
 
     integrantes = ficha_player + criaturas
 
-    for numero, integrante in enumerate(integrantes, start=1):
-        print("  [", numero, "] ", integrante["nome"], sep="")
-
     while True:
+
+        print("\n=== PARTICIPANTES ===")
+
+        for numero, integrante in enumerate(integrantes, start=1):
+            print("  [", numero, "] ", integrante["nome"], sep="")
+
+        print("  [0] Encerrar")
+
         try:
-            participante = int(
+            escolha = int(
                 input("Escolha o número dos participantes (0 para encerrar): ")
             )
         except ValueError:
             print("Digite um número.")
             continue
 
-        if participante == 0:
+        if escolha == 0:
             break
 
         try:
-            participante = integrantes[participante - 1]
+            integrante = integrantes[escolha - 1]
         except IndexError:
             print("Opção inválida.")
             continue
 
-        participantes.append(participante)
+        if isinstance(integrante, npc):
 
-        print(f"{participante['nome']} adicionado ao combate.")
+            quantidade = 0
 
+            for criatura in participantes:
+                if isinstance(criatura, npc):
+                    if criatura.tipo == integrante.tipo:
+                        quantidade += 1
+
+            nova_criatura = deepcopy(integrante)
+
+            nova_criatura.nome = nova_criatura.tipo + str(quantidade + 1)
+
+            participantes.append(nova_criatura)
+
+            print(f"{nova_criatura.nome} adicionado ao combate.")
+
+        else:
+
+            participantes.append(integrante)
+
+            print(f"{integrante['nome']} adicionado ao combate.")
+
+
+   
     cenario = {
         "nome": nome,
         "participantes": participantes,
     }
 
+    
+
     cenarios.append(cenario)
-
-
-cenarios = []  # armazena o nome do local e os participantes
 
 
 def exibir_cenarios():
@@ -1011,11 +1067,13 @@ def combate_com_alvo(participantes):
         return
 
     while True:
+
         print("\n" + "-" * 40)
         print("VIDA ATUAL DO ALVO:", alvo["nome"], "=", alvo["vida"])
         print("-" * 40)
 
         combate_terminou = ataque(atacante, alvo)
+
         if combate_terminou:
             print("\n" + "=" * 50)
             print("COMBATE ENCERRADO")
@@ -1028,8 +1086,10 @@ def combate_com_alvo(participantes):
         print("-" * 40)
 
         print("--- ESCOLHA O ATACANTE ---")
+
         for numero, jogador in enumerate(participantes, start=1):
             print("  [", numero, "] ", jogador["nome"], sep="")
+
         print("  [0] Encerrar combate")
 
         try:
@@ -1039,11 +1099,18 @@ def combate_com_alvo(participantes):
             continue
 
         if escolha == 0:
+
             print("\n" + "=" * 40)
             print("Combate encerrado pelo mestre.")
             print("=" * 40)
-            alvo["vida"] = alvo["vida_maxima"]
+
+            if isinstance(alvo, npc):
+                alvo.vida = alvo.vida_maxima
+            else:
+                alvo["vida"] = alvo["vida_maxima"]
+
             print("Vida do alvo restaurada para", alvo["vida_maxima"])
+
             input("\nPressione ENTER para voltar ao menu...")
             break
 
@@ -1264,6 +1331,5 @@ def menu():
 
 # ========== EXECUTA ==========
 
-menu()
-
+menu_combate_cenarios()
 # teste
