@@ -544,12 +544,7 @@ orc = npc(
     "Guerreiro",
     {"nome": "Machado", "dano": 15},
     [{"nome": "Machado", "dano": 15}],
-    {
-        "força": 15,
-        "agilidade": 6,
-        "inteligencia": 3,
-        "carisma": 2
-    }
+    {"força": 15, "agilidade": 6, "inteligencia": 3, "carisma": 2},
 )
 
 goblin = npc(
@@ -559,12 +554,7 @@ goblin = npc(
     "Ladino",
     {"nome": "Adaga", "dano": 8},
     [{"nome": "Adaga", "dano": 8}],
-    {
-        "força": 5,
-        "agilidade": 14,
-        "inteligencia": 7,
-        "carisma": 4
-    }
+    {"força": 5, "agilidade": 14, "inteligencia": 7, "carisma": 4},
 )
 
 cavaleiro = npc(
@@ -574,12 +564,7 @@ cavaleiro = npc(
     "Paladino",
     {"nome": "Espada", "dano": 12},
     [{"nome": "Espada", "dano": 12}, {"nome": "Escudo", "defesa": 10}],
-    {
-        "força": 14,
-        "agilidade": 7,
-        "inteligencia": 8,
-        "carisma": 12
-    }
+    {"força": 14, "agilidade": 7, "inteligencia": 8, "carisma": 12},
 )
 
 mago = npc(
@@ -589,12 +574,7 @@ mago = npc(
     "Mago",
     {"nome": "Cajado", "dano": 10},
     [{"nome": "Cajado", "dano": 10}, {"nome": "Poção", "cura": 20}],
-    {
-        "força": 3,
-        "agilidade": 6,
-        "inteligencia": 18,
-        "carisma": 10
-    }
+    {"força": 3, "agilidade": 6, "inteligencia": 18, "carisma": 10},
 )
 
 
@@ -737,10 +717,6 @@ def novo_npc():
 
 
 # ========== COMBATE ==========
-
-
-
-
 
 
 def iniciar_combate():  # em produçao
@@ -1160,3 +1136,6 @@ def menu():
 
 # ========== EXECUTA ==========
 monstros()
+
+
+# teste

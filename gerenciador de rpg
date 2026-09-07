@@ -537,12 +537,11 @@ def listar_players():
 
 
 # ========== CRIATURAS ==========
-
-
 class npc:
     def __init__(self, nome, vida, mana, classe, arma, inventario, atributos):
         self.nome = nome
         self.vida = vida
+        self.vida_maxima = vida
         self.mana = mana
         self.classe = classe
         self.arma = arma
@@ -863,7 +862,12 @@ def ataque(atacante, alvo):
             dano_força = atacante["atributos"]["força"]
             dano_total = dano_arma + dano_força
 
-            vida_restante = alvo["vida"] - dano_total
+            if isinstance(alvo, npc):
+                vida_atual = alvo.vida
+            else:
+                vida_atual = alvo["vida"]
+
+            vida_restante = vida_atual - dano_total
 
             print("\n" + "=" * 50)
             print(atacante["nome"], "ACERTOU", alvo["nome"], "!")
@@ -877,11 +881,20 @@ def ataque(atacante, alvo):
                 print("\n" + "=" * 50)
                 print(alvo["nome"].upper(), "FOI ELIMINADO!")
                 print("=" * 50)
-                alvo["vida"] = alvo["vida_maxima"]
+
+                if isinstance(alvo, npc):
+                    alvo.vida = alvo.vida_maxima
+                else:
+                    alvo["vida"] = alvo["vida_maxima"]
 
                 return True
+
             else:
-                alvo["vida"] = vida_restante
+                if isinstance(alvo, npc):
+                    alvo.vida = vida_restante
+                else:
+                    alvo["vida"] = vida_restante
+
                 print("\n--- VIDA RESTANTE ---")
                 print(alvo["nome"], "agora tem", vida_restante, "de vida")
                 return False
@@ -896,8 +909,14 @@ def ataque(atacante, alvo):
             print("\n" + "=" * 50)
             print("HIT KILL! COMBATE ENCERRADO PELO MESTRE")
             print("=" * 50)
-            alvo["vida"] = alvo["vida_maxima"]
-            print("Vida do alvo restaurada para", alvo["vida_maxima"])
+
+            if isinstance(alvo, npc):
+                alvo.vida = alvo.vida_maxima
+                print("Vida do alvo restaurada para", alvo.vida_maxima)
+            else:
+                alvo["vida"] = alvo["vida_maxima"]
+                print("Vida do alvo restaurada para", alvo["vida_maxima"])
+
             return True
 
         else:
@@ -1206,7 +1225,7 @@ def menu_combate():
         if opcao == 0:
             break
         elif opcao == 1:
-            combate_com_alvo()
+            combate_com_alvo(participantes=ficha_player + criaturas)
         elif opcao == 2:
             combate_livre()
         elif opcao == 3:
@@ -1244,4 +1263,7 @@ def menu():
 
 
 # ========== EXECUTA ==========
-menu_combate_cenarios()
+
+menu()
+
+# teste
