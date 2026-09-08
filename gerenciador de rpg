@@ -8,6 +8,7 @@ import random
 
 from copy import deepcopy
 
+
 # ========== FUNÇÃO AUXILIAR ==========
 def dado(lados):
     return random.randint(1, lados)
@@ -747,9 +748,6 @@ def novo_npc():
     print("npc criado com sucesso!")
 
 
-
-
-
 def selecionar_npc(participantes):
 
     print("\nEscolha a criatura:")
@@ -775,9 +773,12 @@ def selecionar_npc(participantes):
         participantes.append(nova_criatura)
 
         print(nova_criatura.nome, "adicionado ao combate!")
+
+
 # ========== COMBATE ==========
 
 cenarios = []
+
 
 def criar_cenario():
 
@@ -836,14 +837,10 @@ def criar_cenario():
 
             print(f"{integrante['nome']} adicionado ao combate.")
 
-
-   
     cenario = {
         "nome": nome,
         "participantes": participantes,
     }
-
-    
 
     cenarios.append(cenario)
 
@@ -979,11 +976,6 @@ def ataque(atacante, alvo):
             print("Resposta invalida. Digite S, N ou 0.")
 
 
-menus_de_combate_com_alvo = [
-    criar_cenario,
-    exibir_cenarios,
-    escolher_cenario,
-]
 
 
 def menu_combate_cenarios():
@@ -992,7 +984,7 @@ def menu_combate_cenarios():
     print("MENU DE COMBATE")
     print("=" * 50)
 
-    for numero, opcao in enumerate(menus_de_combate_com_alvo, start=1):
+    for numero, opcao in enumerate(menus_de_combate_com_cenarios, start=1):
         print(
             "  [", numero, "] ", opcao.__name__.replace("_", " ").capitalize(), sep=""
         )
@@ -1009,7 +1001,7 @@ def menu_combate_cenarios():
             break
 
         try:
-            combate_atual = menus_de_combate_com_alvo[escolha - 1]()
+            combate_atual = menus_de_combate_com_cenarios[escolha - 1]()
         except IndexError:
             print("Opção inválida.")
             continue
@@ -1019,7 +1011,7 @@ def menu_combate_cenarios():
             combate_com_alvo(participantes)
 
 
-def combate_com_alvo(participantes):
+def combate_com_alvo(participantes = ficha_player + criaturas):
 
     print("\n" + "=" * 50)
     print("INICIANDO COMBATE")
@@ -1253,6 +1245,8 @@ def menu_players():
             print("Opcao invalida.")
 
 
+
+
 def menu_itens():
     while True:
         print("\n=== MENU ITENS ===")
@@ -1277,59 +1271,74 @@ def menu_itens():
             print("Opcao invalida.")
 
 
+
+
+
 def menu_combate():
     while True:
         print("\n=== MENU COMBATE ===")
-        print("1 - Combate com alvo (contra criatura)")
-        print("2 - Combate livre (sem alvo)")
-        print("3 - Rolagem livre (teste de atributo)")
-        print("0 - Voltar")
+
+        for numero, opcao in enumerate(menus_de_combate, start=1):
+            print(
+                "  [", numero, "] ", opcao.__name__.replace("_", " ").capitalize(), sep=""
+            )
         try:
-            opcao = int(input("Escolha: "))
+            escolha = int(input("Escolha: "))
         except ValueError:
             print("Digite um numero.")
             continue
-        if opcao == 0:
+        if escolha == 0:
             break
-        elif opcao == 1:
-            combate_com_alvo(participantes=ficha_player + criaturas)
-        elif opcao == 2:
-            combate_livre()
-        elif opcao == 3:
-            rolagem_livre()
-        else:
-            print("Opcao invalida.")
 
+        escolha = menus_de_combate[escolha - 1]()
+        
+
+
+#menu principal do sistema
 
 def menu():
-    while True:
-        print("\n=== SISTEMA DE GERENCIAMENTO RPG ===")
-        print("1 - Players")
-        print("2 - Itens")
-        print("3 - Combate")
-        print("4 - NPCs")
-        print("0 - Sair")
-        try:
-            opcao = int(input("Escolha: "))
-        except ValueError:
-            print("Digite um numero.")
-            continue
-        if opcao == 0:
-            print("Saindo...")
-            break
-        elif opcao == 1:
-            menu_players()
-        elif opcao == 2:
-            menu_itens()
-        elif opcao == 3:
-            menu_combate()
-        elif opcao == 4:
-            novo_npc()
-        else:
-            print("Opcao invalida.")
 
+    while True:
+    
+        print("\n=== SISTEMA DE GERENCIAMENTO RPG ===")
+            
+        print("\n" + "=" * 50)
+        print("MENU DE COMBATE")
+        print("=" * 50)
+
+        for numero, opcao in enumerate(menus, start=1):
+            print("  [", numero, "] ", opcao.__name__.replace("_", " ").capitalize(), sep="")
+
+        while True:
+            try:
+                opçao = int(input("Escolha: "))
+            except ValueError:
+                print("Digite um numero.")
+                continue
+            if opcao == 0:
+                print("Saindo...")
+                break
+
+        escolha = menus[opçao - 1]() 
+
+    
+
+# ===== lista com os menus do sistema =====
+ menus = [menu_players, novo_npc, menu_itens, menu_combate, menu_combate_cenarios]
+
+# ==== menu com as opçoes de combate ====
+
+menus_de_combate = [combate_com_alvo, combate_livre, rolagem_livre]
+        
+# ==== lista com as opçoes de combate com cenarios ====
+
+menus_de_combate_com_cenarios = [
+    criar_cenario,
+    exibir_cenarios,
+    escolher_cenario,
+]
 
 # ========== EXECUTA ==========
 
-menu_combate_cenarios()
+menu_combate()
 # teste
