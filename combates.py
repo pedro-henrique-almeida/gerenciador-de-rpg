@@ -1,4 +1,5 @@
 import random
+from copy import deepcopy
 import copy
 import itens
 import npcs
@@ -168,16 +169,7 @@ def combate_com_alvo(participantes= lutadores):
 
     print("\n--- ESCOLHA O ALVO ---")
     for numero, criatura in enumerate(participantes, start=1):
-        print(
-            "  [",
-            numero,
-            "] ",
-            criatura["nome"],
-            " (Vida: ",
-            criatura["vida"],
-            ")",
-            sep="",
-        )
+        print("  [",numero,"] ",criatura["nome"]," (Vida: ", criatura["vida"],")",sep="",)
 
     try:
         escolha_alvo = int(input("Numero do alvo: "))
@@ -368,6 +360,35 @@ def rolagem_livre():
         print("Bonus: +", valor_atributo)
         print("Resultado:", resultado)
         input("\nPressione ENTER para continuar...")
+
+
+
+
+def selecionar_npc(participantes):
+
+    print("\nEscolha a criatura:")
+
+    for numero, criatura in enumerate(npcs.criaturas, start=1):
+        print(numero, "-", criatura.nome)
+
+    escolha = int(input("Escolha: "))
+
+    classe_escolhida = npcs.criaturas[escolha - 1]
+
+    quantidade = 0
+
+    for criatura in participantes:
+        if criatura.tipo == classe_escolhida.tipo:
+            quantidade += 1
+
+    if isinstance(classe_escolhida, npc):
+        nova_criatura =  (classe_escolhida)
+
+        nova_criatura.nome = nova_criatura.tipo + str(quantidade + 1)
+
+        participantes.append(nova_criatura)
+
+        print(nova_criatura.nome, "adicionado ao combate!")
 
 
 

@@ -1,12 +1,23 @@
 from copy import deepcopy
-import random
+import combates
 import players
 import npcs
 
 personagens = players.ficha_player + npcs.criaturas
 inimigos = npcs.criaturas
 
-cenarios = []
+
+floresta = {
+    "nome": "Floresta",
+    "participantes": [
+        npcs.criaturas[0],
+        npcs.criaturas[1],
+        npcs.criaturas[2],
+    ],
+}
+
+
+cenarios = [floresta]
 
 
 def criar_cenario():
@@ -50,7 +61,7 @@ def criar_cenario():
 
             for criatura in participantes:
                 if criatura in inimigos:
-                    if criatura.tipo == integrante.tipo:
+                    if criatura.tipo == inimigos.tipo:
                         quantidade += 1
 
             nova_criatura = deepcopy(integrante)
@@ -119,8 +130,103 @@ def escolher_cenario():
             print("Opção inválida.")
 
 
+
+def iniciar_combate():
+    if not cenarios:
+        print("Nenhum cenário criado.")
+        return
+
+    while True:
+        print("\n=== CENÁRIOS ===")
+
+        for numero, cenario in enumerate(cenarios, start=1):
+            print(f"{numero}. {cenario['nome']}")
+
+        print("0. Voltar")
+
+        try:
+            escolha = int(input("Escolha um cenário: "))
+        except ValueError:
+            print("Digite um número.")
+            continue
+
+        if escolha == 0:
+            return
+
+        if escolha < 1 or escolha > len(cenarios):
+            print("Opção inválida.")
+            continue
+
+        cenario = cenarios[escolha - 1]
+
+        while True:
+            print("\n" + "=" * 50)
+            print(f"CENÁRIO: {cenario['nome'].upper()}")
+            print("=" * 50)
+
+            print("\nParticipantes:")
+            for participante in cenario["participantes"]:
+                print(f"- {participante.nome}")
+
+            print("\n[1] Iniciar combate")
+            print("[0] Sair do cenário")
+
+            try:
+                opcao = int(input("Escolha: "))
+            except ValueError:
+                print("Digite um número.")
+                continue
+
+            if opcao == 0:
+                break
+
+            if opcao == 1:
+                combates.combate_com_alvo(cenario["participantes"])
+
+            else:
+                print("Opção inválida.")
+
+
+
+
+
+def menu_cenarios():
+
+    while True:
+
+        print("\n=== MENU CENÁRIOS ===")
+
+        print("\n" + "=" * 50)
+        print("MENU PRINCIPAL")
+        print("=" * 50)
+
+        for numero, opcao in enumerate(menus_de_combate_com_cenarios, start=1):
+            print(
+                "  [", numero, "] ",
+                opcao.__name__.replace("_", " ").capitalize(),
+                sep=""
+            )
+
+        print("  [0] Sair")
+
+        try:
+            escolha = int(input("Escolha: "))
+        except ValueError:
+            print("Digite um numero.")
+            continue
+
+        if escolha == 0:
+            print("Saindo do sistema...")
+            break
+
+        try:
+            menus_de_combate_com_cenarios[escolha - 1]()
+        except IndexError:
+            print("Opção inválida.")
+
+
 menus_de_combate_com_cenarios = [
     criar_cenario,
     exibir_cenarios,
     escolher_cenario,
-]
+    iniciar_combate,]
