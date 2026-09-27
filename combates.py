@@ -299,66 +299,59 @@ def combate_livre():
 
 
 def rolagem_livre():
-    print("\n" + "=" * 40)
-    print("ROLAGEM LIVRE")
-    print("=" * 40)
-    print("\n--- ESCOLHA O PLAYER ---")
-    for numero, jogador in enumerate(jogadores, start=1):
-        print("  [", numero, "] ", jogador["nome"], sep="")
 
-    try:
-        escolha = int(input("Numero do player: "))
-    except ValueError:
-        print("Digite um numero.")
-        return
+    while True:
+        print("\n" + "=" * 40)
+        print("ROLAGEM LIVRE")
+        print("=" * 40)
+        print("\n--- ESCOLHA O PLAYER ---")
+        for numero, jogador in enumerate(jogadores, start=1):
+            print("  [", numero, "] ", jogador["nome"], sep="")
 
-    try:
-        jogador = jogadores[escolha - 1]
-    except IndexError:
-        print("Opcao invalida.")
-        return
+        try:
+            escolha = int(input("Numero do player: "))
+        except ValueError:
+            print("Digite um numero.")
+            return
 
-    print("\n--- ATRIBUTOS DISPONIVEIS ---")
-    lista_atributos = ["força", "agilidade", "inteligencia", "carisma"]
-    for i, atributo in enumerate(lista_atributos, start=1):
-        print(
-            "  [",
-            i,
-            "] ",
-            atributo.capitalize(),
-            " (valor: ",
-            jogador["atributos"][atributo],
-            ")",
-            sep="",
-        )
-    print("  [0] Cancelar")
+        try:
+            jogador = jogadores[escolha - 1]
+        except IndexError:
+            print("Opcao invalida.")
+            return
 
-    try:
-        escolha_attr = int(input("Escolha o atributo: "))
-    except ValueError:
-        print("Digite um numero.")
-        return
+        print("\n--- ATRIBUTOS DISPONIVEIS ---")
+        lista_atributos = ["força", "agilidade", "inteligencia", "carisma"]
+        for i, atributo in enumerate(lista_atributos, start=1):
+            print( "  [", i,"] ",atributo.capitalize()," (valor: ",jogador["atributos"][atributo],")",sep="",)
+        print("  [0] Cancelar")
 
-    if escolha_attr == 0:
-        return
+        try:
+            escolha_attr = int(input("Escolha o atributo: "))
+        except ValueError:
+            print("Digite um numero.")
+            return
 
-    try:
-        atributo_escolhido = lista_atributos[escolha_attr - 1]
-    except IndexError:
-        print("Opcao invalida.")
-        return
+        if escolha_attr == 0:
+            return
 
-    valor_atributo = jogador["atributos"][atributo_escolhido]
-    rolagem = random.randint(1, 20)
-    resultado = rolagem + valor_atributo
+        try:
+            atributo_escolhido = lista_atributos[escolha_attr - 1]
+        except IndexError:
+            print("Opcao invalida.")
+            return
 
-    print("\n" + "=" * 40)
-    print("TESTE DE", atributo_escolhido.upper())
-    print("=" * 40)
-    print("D20:", rolagem)
-    print("Bonus: +", valor_atributo)
-    print("Resultado:", resultado)
-    input("\nPressione ENTER para continuar...")
+        valor_atributo = jogador["atributos"][atributo_escolhido]
+        rolagem = random.randint(1, 20)
+        resultado = rolagem + valor_atributo
+
+        print("\n" + "=" * 40)
+        print("TESTE DE", atributo_escolhido.upper())
+        print("=" * 40)
+        print("D20:", rolagem)
+        print("Bonus: +", valor_atributo)
+        print("Resultado:", resultado)
+        input("\nPressione ENTER para continuar...")
 
 
-combate_com_alvo()
+rolagem_livre()
