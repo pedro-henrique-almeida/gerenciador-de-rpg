@@ -1,8 +1,10 @@
-
-import copy
+from copy import deepcopy
 import random
+import players
+import npcs
 
-
+personagens = players.ficha_player + npcs.criaturas
+inimigos = npcs.criaturas
 
 cenarios = []
 
@@ -13,7 +15,8 @@ def criar_cenario():
 
     nome = input("Digite o nome do local: ")
 
-    integrantes = ficha_player + criaturas
+    integrantes = personagens
+    monstros = inimigos
 
     while True:
 
@@ -41,12 +44,12 @@ def criar_cenario():
             print("Opção inválida.")
             continue
 
-        if isinstance(integrante, npc):
+        if integrante in personagens:
 
             quantidade = 0
 
             for criatura in participantes:
-                if isinstance(criatura, npc):
+                if criatura in inimigos:
                     if criatura.tipo == integrante.tipo:
                         quantidade += 1
 
@@ -114,3 +117,10 @@ def escolher_cenario():
             return cenario
         except IndexError:
             print("Opção inválida.")
+
+
+menus_de_combate_com_cenarios = [
+    criar_cenario,
+    exibir_cenarios,
+    escolher_cenario,
+]

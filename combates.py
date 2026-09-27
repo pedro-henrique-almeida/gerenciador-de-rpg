@@ -3,10 +3,15 @@ import copy
 import itens
 import npcs
 import players
+import cenarios
 
 lutadores = players.ficha_player + npcs.criaturas 
 jogadores = players.ficha_player
 inimigos = npcs.criaturas
+locais =cenarios.menus_de_combate_com_cenarios
+
+
+
 
 def ataque(atacante, alvo):
     rolagem = random.randint(1, 20)
@@ -126,6 +131,17 @@ def menu_combate_cenarios():
         if combate_atual:
             participantes = combate_atual["participantes"]
             combate_com_alvo(participantes)
+
+
+
+
+
+
+
+
+
+
+
 
 
 def combate_com_alvo(participantes= lutadores):
