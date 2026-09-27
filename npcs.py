@@ -1,3 +1,7 @@
+import itens
+
+
+
 class npc:
     def __init__(self, nome, vida, mana, classe, arma, inventario, atributos):
         self.nome = nome
@@ -58,7 +62,7 @@ mago = npc(
 criaturas = [orc, goblin, cavaleiro, mago]
 
 
-def monstros():
+def listar_npc():
     while True:
         print("==== MONSTROS ====")
 
@@ -128,7 +132,7 @@ def novo_npc():
     classe = input("informe a classe: ")
 
     print("== Lista de Itens ==")
-    for numero, arma in enumerate(itens, start=1):
+    for numero, arma in enumerate(itens.itens, start=1):
         print(numero, "-", arma["nome"])
 
     while True:
@@ -138,7 +142,7 @@ def novo_npc():
             print("Digite um número.")
             continue
         try:
-            arma = itens[escolha - 1]
+            arma = itens.itens[escolha - 1]
             break
         except IndexError:
             print("Opção inválida.")
@@ -232,3 +236,37 @@ def selecionar_npc(participantes):
         participantes.append(nova_criatura)
 
         print(nova_criatura.nome, "adicionado ao combate!")
+
+
+def menu_npcs():
+
+    while True:
+
+    
+
+        print("\n" + "=" * 50)
+        print("MENU DE NPCS")
+        print("=" * 50)
+
+        for numero, opcao in enumerate(menus_npcs, start=1):
+            print("  [", numero, "] ",opcao.__name__.replace("_", " ").capitalize(),sep="")
+
+        print("  [0] Sair")
+
+        try:
+            escolha = int(input("Escolha: "))
+        except ValueError:
+            print("Digite um numero.")
+            continue
+
+        if escolha == 0:
+            print("Saindo do sistema...")
+            break
+
+        try:
+            menus_npcs[escolha - 1]()
+        except IndexError:
+            print("Opção inválida.")
+
+
+menus_npcs = [listar_npc, novo_npc]
