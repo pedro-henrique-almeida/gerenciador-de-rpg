@@ -3,7 +3,7 @@
 
 
 import itens
-
+armas = itens.itens
 
 
 # ========== PLAYERS ==========
@@ -238,7 +238,7 @@ def adicionar_item_ao_inventario(jogador):
     """Adiciona um item da lista global ao inventário do jogador."""
     print("\n=== ADICIONAR ITEM AO INVENTÁRIO ===")
     print("Itens disponíveis:")
-    for numero, item in enumerate(itens, start=1):
+    for numero, item in enumerate(armas, start=1):
         print(numero, "-", item["nome"], "(dano:", item["dano"], ")")
     print("0 - Cancelar")
     try:
@@ -249,7 +249,7 @@ def adicionar_item_ao_inventario(jogador):
     if escolha == 0:
         return
     try:
-        item = itens[escolha - 1]
+        item = armas[escolha - 1]
     except IndexError:
         print("Opção inválida.")
         return

@@ -370,4 +370,28 @@ def rolagem_livre():
         input("\nPressione ENTER para continuar...")
 
 
-rolagem_livre()
+
+
+def menu_combate():
+    while True:
+        print("\n=== MENU COMBATE ===")
+
+        for numero, opcao in enumerate(menus_de_combate, start=1):
+            print(
+                "  [", numero, "] ", opcao.__name__.replace("_", " ").capitalize(), sep=""
+            )
+        try:
+            escolha = int(input("Escolha: "))
+        except ValueError:
+            print("Digite um numero.")
+            continue
+        if escolha == 0:
+            break
+
+        escolha = menus_de_combate[escolha - 1]()
+
+
+
+menus_de_combate = [combate_com_alvo, combate_livre, rolagem_livre]
+
+
