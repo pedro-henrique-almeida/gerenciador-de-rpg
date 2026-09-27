@@ -384,4 +384,3 @@ def listar_players():
             continue
         exibir_player_completo(jogador)
 
-novo_jogador()

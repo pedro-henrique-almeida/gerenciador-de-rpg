@@ -1,9 +1,15 @@
 import random
 import copy
+import itens
+import npcs
+import players
 
+lutadores = players.ficha_player + npcs.criaturas 
+jogadores = players.ficha_player
+inimigos = npcs.criaturas
 
 def ataque(atacante, alvo):
-    rolagem = dado(20)
+    rolagem = random.randint(1, 20)
     bonus_agilidade = atacante["atributos"]["agilidade"]
     teste = rolagem + bonus_agilidade
 
@@ -28,7 +34,7 @@ def ataque(atacante, alvo):
             dano_força = atacante["atributos"]["força"]
             dano_total = dano_arma + dano_força
 
-            if isinstance(alvo, npc):
+            if alvo in inimigos:
                 vida_atual = alvo.vida
             else:
                 vida_atual = alvo["vida"]
@@ -48,7 +54,7 @@ def ataque(atacante, alvo):
                 print(alvo["nome"].upper(), "FOI ELIMINADO!")
                 print("=" * 50)
 
-                if isinstance(alvo, npc):
+                if alvo in inimigos:
                     alvo.vida = alvo.vida_maxima
                 else:
                     alvo["vida"] = alvo["vida_maxima"]
@@ -56,7 +62,7 @@ def ataque(atacante, alvo):
                 return True
 
             else:
-                if isinstance(alvo, npc):
+                if alvo in inimigos:
                     alvo.vida = vida_restante
                 else:
                     alvo["vida"] = vida_restante
@@ -76,7 +82,7 @@ def ataque(atacante, alvo):
             print("HIT KILL! COMBATE ENCERRADO PELO MESTRE")
             print("=" * 50)
 
-            if isinstance(alvo, npc):
+            if alvo in inimigos:
                 alvo.vida = alvo.vida_maxima
                 print("Vida do alvo restaurada para", alvo.vida_maxima)
             else:
@@ -122,7 +128,7 @@ def menu_combate_cenarios():
             combate_com_alvo(participantes)
 
 
-def combate_com_alvo(participantes=ficha_player + criaturas):
+def combate_com_alvo(participantes= lutadores):
 
     print("\n" + "=" * 50)
     print("INICIANDO COMBATE")
@@ -207,12 +213,11 @@ def combate_com_alvo(participantes=ficha_player + criaturas):
             print("Combate encerrado pelo mestre.")
             print("=" * 40)
 
-            if isinstance(alvo, npc):
+            if alvo in inimigos:
                 alvo.vida = alvo.vida_maxima
             else:
                 alvo["vida"] = alvo["vida_maxima"]
 
-            print("Vida do alvo restaurada para", alvo["vida_maxima"])
 
             input("\nPressione ENTER para voltar ao menu...")
             break
@@ -225,45 +230,72 @@ def combate_com_alvo(participantes=ficha_player + criaturas):
 
 
 def combate_livre():
-    print("\n" + "=" * 40)
-    print("COMBATE LIVRE")
-    print("=" * 40)
-    print("\n--- ESCOLHA O ATACANTE ---")
-    for numero, jogador in enumerate(ficha_player, start=1):
-        print("  [", numero, "] ", jogador["nome"], sep="")
 
-    try:
-        escolha = int(input("Numero do atacante: "))
-    except ValueError:
-        print("Digite um numero.")
-        return
+    while True:
 
-    try:
-        atacante = ficha_player[escolha - 1]
-    except IndexError:
-        print("Opcao invalida.")
-        return
+    
+        print("\n" + "=" * 40)
+        print("COMBATE LIVRE")
+        print("=" * 40)
+        print("\n--- ESCOLHA O ATACANTE ---")
+        for numero, jogador in enumerate(jogadores, start=1):
+            print("  [", numero, "] ", jogador["nome"], sep="")
 
-    rolagem = dado(20)
-    bonus_agilidade = atacante["atributos"]["agilidade"]
-    teste = rolagem + bonus_agilidade
-    dano_arma = atacante["arma"]["dano"]
-    dano_força = atacante["atributos"]["força"]
-    dano_total = dano_arma + dano_força
+        print("  [0] Encerrar combate")
 
-    print("\n" + "=" * 40)
-    print(atacante["nome"].upper(), "ATACA!")
-    print("=" * 40)
-    print("\n--- ROLAGEM DE ATAQUE ---")
-    print("D20:", rolagem)
+        try:
+            escolha = int(input("Numero do atacante: "))
+        except ValueError:
+            print("Digite um numero.")
+            return
 
-    print("Bonus de Agilidade: +", bonus_agilidade)
-    print("Total do teste:", teste)
-    print("\n--- DANO POTENCIAL ---")
-    print("Dano da arma (", atacante["arma"]["nome"], "):", dano_arma)
-    print("Bonus de Forca: +", dano_força)
-    print("Dano total:", dano_total)
-    input("\nPressione ENTER para continuar...")
+        if escolha == 0:
+            print("\n" + "=" * 40)
+            print("Combate encerrado.")
+            print("=" * 40)
+            return
+
+        try:
+            atacante = jogadores[escolha - 1]
+        except IndexError:
+            print("Opcao invalida.")
+            return
+
+        rolagem = random.randint(1, 20)
+        bonus_agilidade = atacante["atributos"]["agilidade"]
+        teste = rolagem + bonus_agilidade
+        dano_arma = atacante["arma"]["dano"]
+        dano_força = atacante["atributos"]["força"]
+        dano_total = dano_arma + dano_força
+
+        print("\n" + "=" * 40)
+        print(atacante["nome"].upper(), "ATACA!")
+        print("=" * 40)
+        print("\n--- ROLAGEM DE ATAQUE ---")
+        print("D20:", rolagem)
+
+        print("Bonus de Agilidade: +", bonus_agilidade)
+        print("Total do teste:", teste)
+
+        acerto = input("\nO ataque acertou? (S/N): ").strip().upper()
+
+        if acerto == "S":
+            print("\n" + "=" * 40)
+            print(atacante["nome"], "ACERTOU!")
+            print("=" * 40)
+
+            print("\n--- DANO POTENCIAL ---")
+            print("Dano da arma (", atacante["arma"]["nome"], "):", dano_arma)
+            print("Bonus de Forca: +", dano_força)
+            print("Dano total:", dano_total)
+            input("\nPressione ENTER para continuar...")
+            
+
+
+        else:
+            print("\n" + "=" * 40)
+            print(atacante["nome"], "ERROU!")
+            print("=" * 40)
 
 
 def rolagem_livre():
@@ -271,7 +303,7 @@ def rolagem_livre():
     print("ROLAGEM LIVRE")
     print("=" * 40)
     print("\n--- ESCOLHA O PLAYER ---")
-    for numero, jogador in enumerate(ficha_player, start=1):
+    for numero, jogador in enumerate(jogadores, start=1):
         print("  [", numero, "] ", jogador["nome"], sep="")
 
     try:
@@ -281,7 +313,7 @@ def rolagem_livre():
         return
 
     try:
-        jogador = ficha_player[escolha - 1]
+        jogador = jogadores[escolha - 1]
     except IndexError:
         print("Opcao invalida.")
         return
@@ -317,7 +349,7 @@ def rolagem_livre():
         return
 
     valor_atributo = jogador["atributos"][atributo_escolhido]
-    rolagem = dado(20)
+    rolagem = random.randint(1, 20)
     resultado = rolagem + valor_atributo
 
     print("\n" + "=" * 40)
@@ -327,3 +359,6 @@ def rolagem_livre():
     print("Bonus: +", valor_atributo)
     print("Resultado:", resultado)
     input("\nPressione ENTER para continuar...")
+
+
+combate_com_alvo()
