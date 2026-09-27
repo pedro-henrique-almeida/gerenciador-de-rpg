@@ -62,7 +62,7 @@ maos = {
 }
 
 # Lista global de todos os itens disponíveis
-itens = [
+itens= [
     espada,
     flecha_madeira,
     arco_madeira,
@@ -74,6 +74,8 @@ itens = [
     besta,
     maos,
 ]
+
+
 
 # ========== FUNÇÕES DE ITENS ==========
 
@@ -92,13 +94,13 @@ def novo_item():
         "dano": dano,
         "descriçao": descriçao,
     }
-    itens.append(item_novo)
+    equipamentos.append(item_novo)
     print("Item adicionado com sucesso!")
 
 
 def listar_itens():
     print("== Lista de Itens ==")
-    for numero, arma in enumerate(itens, start=1):
+    for numero, arma in enumerate(armas, start=1):
         print(numero, "-", arma["nome"])
     while True:
         try:
@@ -109,7 +111,7 @@ def listar_itens():
         if escolha == 0:
             break
         try:
-            item = itens[escolha - 1]
+            item = armas[escolha - 1]
         except IndexError:
             print("Opção inválida.")
             continue
@@ -120,10 +122,10 @@ def listar_itens():
 
 def remover_item():
     print("=== REMOVER ITEM ===")
-    if not itens:
+    if not armas:
         print("Nenhum item para remover.")
         return
-    for numero, arma in enumerate(itens, start=1):
+    for numero, arma in enumerate(armas, start=1):
         print(numero, "-", arma["nome"])
     print("0 - Cancelar")
     try:
@@ -135,14 +137,53 @@ def remover_item():
         print("Operação cancelada.")
         return
     try:
-        item = itens[escolha - 1]
+        item = armas[escolha - 1]
     except IndexError:
         print("Opção inválida.")
         return
     nome = item["nome"]
     confirm = input(f"Remover '{nome}'? (s/N): ")
     if confirm.lower() == "s":
-        itens.pop(escolha - 1)
+        armas.pop(escolha - 1)
         print("Item removido.")
     else:
         print("Remoção cancelada.")
+
+
+
+
+
+def menu_itens():
+
+    while True:
+
+        
+
+        print("\n" + "=" * 50)
+        print("MENU DE ITENS")
+        print("=" * 50)
+
+        for numero, opcao in enumerate(menus_de_itens, start=1):
+            print("  [", numero, "] ",opcao.__name__.replace("_", " ").capitalize(),sep="")
+
+        print("  [0] Sair")
+
+        try:
+            escolha = int(input("Escolha: "))
+        except ValueError:
+            print("Digite um numero.")
+            continue
+
+        if escolha == 0:
+            print("Saindo do sistema...")
+            break
+
+        try:
+            menus_de_itens[escolha - 1]()
+        except IndexError:
+            print("Opção inválida.")
+
+
+
+
+menus_de_itens = [listar_itens, novo_item, remover_item]
