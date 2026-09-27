@@ -55,13 +55,13 @@ def criar_cenario():
             print("Opção inválida.")
             continue
 
-        if integrante in personagens:
+        if integrante in inimigos:
 
             quantidade = 0
 
             for criatura in participantes:
                 if criatura in inimigos:
-                    if criatura.tipo == inimigos.tipo:
+                    if criatura.tipo == integrante.tipo:
                         quantidade += 1
 
             nova_criatura = deepcopy(integrante)
