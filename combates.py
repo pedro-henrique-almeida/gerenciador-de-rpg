@@ -9,7 +9,7 @@ import cenarios
 lutadores = players.ficha_player + npcs.criaturas 
 jogadores = players.ficha_player
 inimigos = npcs.criaturas
-locais =cenarios.menus_de_combate_com_cenarios
+
 
 
 

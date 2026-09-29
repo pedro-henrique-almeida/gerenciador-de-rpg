@@ -1,160 +1,18 @@
-import random
+
+import players
+import itens
+import npcs
+import combates
+import cenarios
 from copy import deepcopy
-
-
+equipamentos = itens.itens
+integrantes = players.ficha_player + npcs.criaturas
 # ========== FUNÇÃO AUXILIAR ==========
 def dado(lados):
     return random.randint(1, lados)
 
 
-# ========== ITENS ==========
-espada = {
-    "nome": "espada comum",
-    "dano": 10,
-    "descriçao": "uma espada de ferro comum, essencial em aventuras",
-}
 
-flecha_madeira = {
-    "nome": "flecha de madeira",
-    "quantidade": 10,
-    "dano": 2,
-    "descriçao": "uma flecha de madeira simples, usada com arcos",
-}
-
-arco_madeira = {
-    "nome": "arco de madeira simples",
-    "dano": 5,
-    "flecha de madeira": 5,
-    "descriçao": "um arco de madeira simples, adequado para ataques a longa distancia",
-}
-
-machado = {
-    "nome": "machado de batalha",
-    "dano": 12,
-    "descriçao": "um machado de batalha pesado, ideal para combates corpo a corpo",
-}
-
-katana = {
-    "nome": "katana afiada",
-    "dano": 15,
-    "descriçao": "uma katana afiada, perfeita para ataques rápidos e precisos",
-}
-
-lança = {
-    "nome": "lança longa",
-    "dano": 8,
-    "descriçao": "uma lança longa, usada para ataques a longa distância",
-}
-
-corda = {
-    "nome": "corda resistente",
-    "dano": 0,
-    "descriçao": "uma corda resistente, útil para escaladas e amarrações",
-}
-
-adaga = {
-    "nome": "adaga pequena",
-    "dano": 4,
-    "descriçao": "uma adaga pequena, ideal para ataques furtivos",
-}
-
-besta = {
-    "nome": "besta pesada",
-    "dano": 12,
-    "descriçao": "uma besta pesada, capaz de disparar projéteis com grande força",
-}
-
-maos = {
-    "nome": "mãos",
-    "dano": 6,
-    "descriçao": "esmurra seus oponentes",
-}
-
-# Lista global de todos os itens disponíveis
-itens = [
-    espada,
-    flecha_madeira,
-    arco_madeira,
-    machado,
-    katana,
-    lança,
-    corda,
-    adaga,
-    besta,
-    maos,
-]
-
-# ========== FUNÇÕES DE ITENS ==========
-
-
-def novo_item():
-    print("=== CRIE SEU ITEM ===")
-    nome = input("escolha o nome: ")
-    try:
-        dano = int(input("escolha o dano: "))
-    except ValueError:
-        print("Dano deve ser um número. Usando 0.")
-        dano = 0
-    descriçao = input("escolha a descriçao: ")
-    item_novo = {
-        "nome": nome,
-        "dano": dano,
-        "descriçao": descriçao,
-    }
-    itens.append(item_novo)
-    print("Item adicionado com sucesso!")
-
-
-def listar_itens():
-    print("== Lista de Itens ==")
-    for numero, arma in enumerate(itens, start=1):
-        print(numero, "-", arma["nome"])
-    while True:
-        try:
-            escolha = int(input("Escolha um item (0 para sair): "))
-        except ValueError:
-            print("Digite um número.")
-            continue
-        if escolha == 0:
-            break
-        try:
-            item = itens[escolha - 1]
-        except IndexError:
-            print("Opção inválida.")
-            continue
-        for chave, valor in item.items():
-            print(chave, ":", valor)
-        input("\nPressione ENTER para continuar...")
-
-
-def remover_item():
-    print("=== REMOVER ITEM ===")
-    if not itens:
-        print("Nenhum item para remover.")
-        return
-    for numero, arma in enumerate(itens, start=1):
-        print(numero, "-", arma["nome"])
-    print("0 - Cancelar")
-    try:
-        escolha = int(input("Número do item a remover: "))
-    except ValueError:
-        print("Digite um número.")
-        return
-    if escolha == 0:
-        print("Operação cancelada.")
-        return
-    try:
-        item = itens[escolha - 1]
-    except IndexError:
-        print("Opção inválida.")
-        return
-    nome = item["nome"]
-    confirm = input(f"Remover '{nome}'? (s/N): ")
-    if confirm.lower() == "s":
-        itens.pop(escolha - 1)
-        print("Item removido.")
-    else:
-        print("Remoção cancelada.")
 
 
 # ========== PLAYERS ==========
@@ -165,8 +23,8 @@ kai = {
     "vida": 80,
     "mana": 10,
     "classe": "Guerreiro",
-    "arma": espada,
-    "inventario": [machado, lança, maos],
+    "arma": itens.espada,
+    "inventario": [itens.machado, itens.lança, itens.maos],
     "atributos": {
         "força": 4,
         "agilidade": 2,
@@ -180,9 +38,9 @@ any = {
     "nivel": 1,
     "vida": 50,
     "mana": 50,
-    "arma": arco_madeira,
+    "arma": itens.arco_madeira,
     "classe": "arqueira",
-    "inventario": [flecha_madeira, besta, maos],
+    "inventario": [itens.flecha_madeira, itens.besta, itens.maos],
     "atributos": {
         "força": 2,
         "agilidade": 4,
@@ -196,9 +54,9 @@ lee = {
     "nivel": 1,
     "vida": 40,
     "mana": 20,
-    "arma": katana,
+    "arma": itens.katana,
     "classe": "espadachim",
-    "inventario": [adaga, corda, maos],
+    "inventario": [itens.adaga, itens.corda, itens.maos],
     "atributos": {
         "força": 3,
         "agilidade": 4,
@@ -228,7 +86,7 @@ def novo_jogador():
     classe = input("informe a classe: ")
 
     print("== Lista de Itens ==")
-    for numero, arma in enumerate(itens, start=1):
+    for numero, arma in enumerate(armas, start=1):
         print(numero, "-", arma["nome"])
 
     while True:
@@ -238,7 +96,7 @@ def novo_jogador():
             print("Digite um número.")
             continue
         try:
-            arma = itens[escolha - 1]
+            arma = armas[escolha - 1]
             break
         except IndexError:
             print("Opção inválida.")
@@ -531,215 +389,6 @@ def listar_players():
         exibir_player_completo(jogador)
 
 
-# ========== CRIATURAS ==========
-class npc:
-    def __init__(self, nome, vida, mana, classe, arma, inventario, atributos):
-        self.nome = nome
-        self.tipo = nome
-        self.vida = vida
-        self.vida_maxima = vida
-        self.mana = mana
-        self.classe = classe
-        self.arma = arma
-        self.inventario = inventario
-        self.atributos = atributos
-
-    def __getitem__(self, chave):
-        return getattr(self, chave)
-
-
-orc = npc(
-    "Orc",
-    50,
-    10,
-    "Guerreiro",
-    {"nome": "Machado", "dano": 15},
-    [{"nome": "Machado", "dano": 15}],
-    {"força": 15, "agilidade": 6, "inteligencia": 3, "carisma": 2},
-)
-
-goblin = npc(
-    "Goblin",
-    30,
-    20,
-    "Ladino",
-    {"nome": "Adaga", "dano": 8},
-    [{"nome": "Adaga", "dano": 8}],
-    {"força": 5, "agilidade": 14, "inteligencia": 7, "carisma": 4},
-)
-
-cavaleiro = npc(
-    "Cavaleiro",
-    80,
-    5,
-    "Paladino",
-    {"nome": "Espada", "dano": 12},
-    [{"nome": "Espada", "dano": 12}, {"nome": "Escudo", "defesa": 10}],
-    {"força": 14, "agilidade": 7, "inteligencia": 8, "carisma": 12},
-)
-
-mago = npc(
-    "Mago",
-    35,
-    60,
-    "Mago",
-    {"nome": "Cajado", "dano": 10},
-    [{"nome": "Cajado", "dano": 10}, {"nome": "Poção", "cura": 20}],
-    {"força": 3, "agilidade": 6, "inteligencia": 18, "carisma": 10},
-)
-
-
-criaturas = [orc, goblin, cavaleiro, mago]
-
-
-def monstros():
-    while True:
-        print("==== MONSTROS ====")
-
-        for i, criatura in enumerate(criaturas, start=1):
-            print(f"{i}. {criatura.nome}")
-
-        print("0. Voltar")
-
-        try:
-            escolha = int(input("Escolha o monstro: "))
-        except ValueError:
-            print("Digite um número.")
-            continue
-
-        if escolha == 0:
-            break
-
-        try:
-            mob = criaturas[escolha - 1]
-        except IndexError:
-            print("Opção inválida.")
-            continue
-
-        print(f"\n=== {mob.nome.upper()} ===")
-
-        for chave, valor in mob.__dict__.items():
-
-            if chave == "arma":
-                print("Arma:", valor["nome"])
-
-            elif chave == "inventario":
-                print("Inventário:", end=" ")
-
-                for item in valor:
-                    print(item["nome"], end=", ")
-
-                print()
-
-            elif chave == "atributos":
-                print("Atributos:")
-
-                for atributo, valor_atributo in valor.items():
-                    print(f"  {atributo.capitalize()}: {valor_atributo}")
-
-            else:
-                print(f"{chave.capitalize()}: {valor}")
-
-        input("\nPressione ENTER para continuar...")
-
-
-# CRIAR NPC NO GERAL
-
-
-def novo_npc():
-    print("=== CRIE SEU NPC ===")
-    nome = input("informe o nome: ")
-    try:
-        vida = int(input("informe a vida: "))
-    except ValueError:
-        print("Vida deve ser número. Usando 50.")
-        vida = 50
-    try:
-        mana = int(input("informe a mana: "))
-    except ValueError:
-        print("Mana deve ser número. Usando 10.")
-        mana = 10
-    classe = input("informe a classe: ")
-
-    print("== Lista de Itens ==")
-    for numero, arma in enumerate(itens, start=1):
-        print(numero, "-", arma["nome"])
-
-    while True:
-        try:
-            escolha = int(input("Escolha o número da arma inicial: "))
-        except ValueError:
-            print("Digite um número.")
-            continue
-        try:
-            arma = itens[escolha - 1]
-            break
-        except IndexError:
-            print("Opção inválida.")
-
-    print("==== ESCOLHA SEUS ATRIBUTOS ====")
-    pontos = int(input("Informe a quantidade de pontos para distribuir: "))
-
-    while True:
-        try:
-            força = int(input("Informe sua força: "))
-        except ValueError:
-            print("Digite um número.")
-            continue
-        if força <= pontos:
-            pontos -= força
-            break
-        print("Você não possui essa quantidade de pontos.")
-    print("Pontos restantes:", pontos)
-
-    while True:
-        try:
-            agilidade = int(input("Informe sua agilidade: "))
-        except ValueError:
-            print("Digite um número.")
-            continue
-        if agilidade <= pontos:
-            pontos -= agilidade
-            break
-        print("Você não possui essa quantidade de pontos.")
-    print("Pontos restantes:", pontos)
-
-    while True:
-        try:
-            inteligencia = int(input("Informe sua inteligência: "))
-        except ValueError:
-            print("Digite um número.")
-            continue
-        if inteligencia <= pontos:
-            pontos -= inteligencia
-            break
-        print("Você não possui essa quantidade de pontos.")
-    print("Pontos restantes:", pontos)
-
-    while True:
-        try:
-            carisma = int(input("Informe seu carisma: "))
-        except ValueError:
-            print("Digite um número.")
-            continue
-        if carisma <= pontos:
-            pontos -= carisma
-            break
-        print("Você não possui essa quantidade de pontos.")
-    print("Pontos restantes:", pontos)
-
-    atributos = {
-        "força": força,
-        "agilidade": agilidade,
-        "inteligencia": inteligencia,
-        "carisma": carisma,
-    }
-
-    npc_novo = npc(nome, vida, mana, classe, arma, [arma], atributos)
-
-    criaturas.append(npc_novo)
-    print("npc criado com sucesso!")
-
 
 def selecionar_npc(participantes):
 
@@ -770,443 +419,10 @@ def selecionar_npc(participantes):
 
 # ========== COMBATE ==========
 
-cenarios = []
 
 
-def criar_cenario():
 
-    participantes = []
 
-    nome = input("Digite o nome do local: ")
-
-    integrantes = ficha_player + criaturas
-
-    while True:
-
-        print("\n=== PARTICIPANTES ===")
-
-        for numero, integrante in enumerate(integrantes, start=1):
-            print("  [", numero, "] ", integrante["nome"], sep="")
-
-        print("  [0] Encerrar")
-
-        try:
-            escolha = int(
-                input("Escolha o número dos participantes (0 para encerrar): ")
-            )
-        except ValueError:
-            print("Digite um número.")
-            continue
-
-        if escolha == 0:
-            break
-
-        try:
-            integrante = integrantes[escolha - 1]
-        except IndexError:
-            print("Opção inválida.")
-            continue
-
-        if isinstance(integrante, npc):
-
-            quantidade = 0
-
-            for criatura in participantes:
-                if isinstance(criatura, npc):
-                    if criatura.tipo == integrante.tipo:
-                        quantidade += 1
-
-            nova_criatura = deepcopy(integrante)
-
-            nova_criatura.nome = nova_criatura.tipo + str(quantidade + 1)
-
-            participantes.append(nova_criatura)
-
-            print(f"{nova_criatura.nome} adicionado ao combate.")
-
-        else:
-
-            participantes.append(integrante)
-
-            print(f"{integrante['nome']} adicionado ao combate.")
-
-    cenario = {
-        "nome": nome,
-        "participantes": participantes,
-    }
-
-    cenarios.append(cenario)
-
-
-def exibir_cenarios():
-    if not cenarios:
-        print("Nenhum cenário criado.")
-        return
-
-    print("\n=== CENÁRIOS ===")
-    for numero, cenario in enumerate(cenarios, start=1):
-        print(f"{numero}. {cenario['nome']}")
-
-        print("   Participantes:")
-
-        for participante in cenario["participantes"]:
-
-            print(f"     - {participante['nome']}")
-    input("\nPressione ENTER para continuar...")
-
-
-def escolher_cenario():
-    if not cenarios:
-        print("Nenhum cenário criado.")
-        return None
-
-    print("\n=== ESCOLHER CENÁRIO ===")
-
-    for numero, cenario in enumerate(cenarios, start=1):
-        print(f"{numero}. {cenario['nome']}")
-
-    while True:
-        try:
-            escolha = int(input("Escolha o número do cenário (0 para cancelar): "))
-        except ValueError:
-            print("Digite um número.")
-            continue
-
-        if escolha == 0:
-            return None
-
-        try:
-            cenario = cenarios[escolha - 1]
-            return cenario
-        except IndexError:
-            print("Opção inválida.")
-
-
-def ataque(atacante, alvo):
-    rolagem = dado(20)
-    bonus_agilidade = atacante["atributos"]["agilidade"]
-    teste = rolagem + bonus_agilidade
-
-    print("\n" + "=" * 50)
-    print(atacante["nome"].upper(), "ATACA", alvo["nome"].upper())
-    print("=" * 50)
-    print("\n--- ROLAGEM DE ATAQUE ---")
-    print("D20:", rolagem)
-    print("Bonus de Agilidade: +", bonus_agilidade)
-    print("Total do teste:", teste)
-
-    while True:
-        print("\n" + "-" * 40)
-        print("O MESTRE DECIDE:")
-        print("   [S] - Acertou")
-        print("   [N] - Errou")
-        print("   [0] - Encerrar combate (Hit Kill)")
-        decisao = input("Sua decisao: ").strip().upper()
-
-        if decisao == "S":
-            dano_arma = atacante["arma"]["dano"]
-            dano_força = atacante["atributos"]["força"]
-            dano_total = dano_arma + dano_força
-
-            if isinstance(alvo, npc):
-                vida_atual = alvo.vida
-            else:
-                vida_atual = alvo["vida"]
-
-            vida_restante = vida_atual - dano_total
-
-            print("\n" + "=" * 50)
-            print(atacante["nome"], "ACERTOU", alvo["nome"], "!")
-            print("=" * 50)
-            print("\n--- CALCULO DO DANO ---")
-            print("Dano da arma (", atacante["arma"]["nome"], "):", dano_arma)
-            print("Bonus de Forca: +", dano_força)
-            print("Dano total:", dano_total)
-
-            if vida_restante <= 0:
-                print("\n" + "=" * 50)
-                print(alvo["nome"].upper(), "FOI ELIMINADO!")
-                print("=" * 50)
-
-                if isinstance(alvo, npc):
-                    alvo.vida = alvo.vida_maxima
-                else:
-                    alvo["vida"] = alvo["vida_maxima"]
-
-                return True
-
-            else:
-                if isinstance(alvo, npc):
-                    alvo.vida = vida_restante
-                else:
-                    alvo["vida"] = vida_restante
-
-                print("\n--- VIDA RESTANTE ---")
-                print(alvo["nome"], "agora tem", vida_restante, "de vida")
-                return False
-
-        elif decisao == "N":
-            print("\n" + "=" * 40)
-            print(atacante["nome"], "ERROU o ataque!")
-            print("=" * 40)
-            return False
-
-        elif decisao == "0":
-            print("\n" + "=" * 50)
-            print("HIT KILL! COMBATE ENCERRADO PELO MESTRE")
-            print("=" * 50)
-
-            if isinstance(alvo, npc):
-                alvo.vida = alvo.vida_maxima
-                print("Vida do alvo restaurada para", alvo.vida_maxima)
-            else:
-                alvo["vida"] = alvo["vida_maxima"]
-                print("Vida do alvo restaurada para", alvo["vida_maxima"])
-
-            return True
-
-        else:
-            print("Resposta invalida. Digite S, N ou 0.")
-
-
-def menu_combate_cenarios():
-
-    print("\n" + "=" * 50)
-    print("MENU DE COMBATE")
-    print("=" * 50)
-
-    for numero, opcao in enumerate(menus_de_combate_com_cenarios, start=1):
-        print(
-            "  [", numero, "] ", opcao.__name__.replace("_", " ").capitalize(), sep=""
-        )
-
-    while True:
-
-        try:
-            escolha = int(input("Escolha uma opção (0 para voltar): "))
-        except ValueError:
-            print("Digite um número.")
-            continue
-
-        if escolha == 0:
-            break
-
-        try:
-            combate_atual = menus_de_combate_com_cenarios[escolha - 1]()
-        except IndexError:
-            print("Opção inválida.")
-            continue
-
-        if combate_atual:
-            participantes = combate_atual["participantes"]
-            combate_com_alvo(participantes)
-
-
-def combate_com_alvo(participantes=ficha_player + criaturas):
-
-    print("\n" + "=" * 50)
-    print("INICIANDO COMBATE")
-    print("=" * 50)
-
-    print("\n--- ESCOLHA O ATACANTE ---")
-    for numero, jogador in enumerate(participantes, start=1):
-        print("  [", numero, "] ", jogador["nome"], sep="")
-
-    try:
-        escolha_atacante = int(input("Numero do atacante: "))
-    except ValueError:
-        print("Digite um numero.")
-        return
-
-    try:
-        atacante = participantes[escolha_atacante - 1]
-    except IndexError:
-        print("Opcao invalida.")
-        return
-
-    print("\n--- ESCOLHA O ALVO ---")
-    for numero, criatura in enumerate(participantes, start=1):
-        print(
-            "  [",
-            numero,
-            "] ",
-            criatura["nome"],
-            " (Vida: ",
-            criatura["vida"],
-            ")",
-            sep="",
-        )
-
-    try:
-        escolha_alvo = int(input("Numero do alvo: "))
-    except ValueError:
-        print("Digite um numero.")
-        return
-
-    try:
-        alvo = participantes[escolha_alvo - 1]
-    except IndexError:
-        print("Opcao invalida.")
-        return
-
-    while True:
-
-        print("\n" + "-" * 40)
-        print("VIDA ATUAL DO ALVO:", alvo["nome"], "=", alvo["vida"])
-        print("-" * 40)
-
-        combate_terminou = ataque(atacante, alvo)
-
-        if combate_terminou:
-            print("\n" + "=" * 50)
-            print("COMBATE ENCERRADO")
-            print("=" * 50)
-            input("\nPressione ENTER para voltar ao menu...")
-            break
-
-        print("\n" + "-" * 40)
-        print("NOVO ATAQUE")
-        print("-" * 40)
-
-        print("--- ESCOLHA O ATACANTE ---")
-
-        for numero, jogador in enumerate(participantes, start=1):
-            print("  [", numero, "] ", jogador["nome"], sep="")
-
-        print("  [0] Encerrar combate")
-
-        try:
-            escolha = int(input("Numero do atacante (0 para encerrar): "))
-        except ValueError:
-            print("Digite um numero.")
-            continue
-
-        if escolha == 0:
-
-            print("\n" + "=" * 40)
-            print("Combate encerrado pelo mestre.")
-            print("=" * 40)
-
-            if isinstance(alvo, npc):
-                alvo.vida = alvo.vida_maxima
-            else:
-                alvo["vida"] = alvo["vida_maxima"]
-
-            print("Vida do alvo restaurada para", alvo["vida_maxima"])
-
-            input("\nPressione ENTER para voltar ao menu...")
-            break
-
-        try:
-            atacante = participantes[escolha - 1]
-        except IndexError:
-            print("Opcao invalida. Tente novamente.")
-            continue
-
-
-def combate_livre():
-    print("\n" + "=" * 40)
-    print("COMBATE LIVRE")
-    print("=" * 40)
-    print("\n--- ESCOLHA O ATACANTE ---")
-    for numero, jogador in enumerate(ficha_player, start=1):
-        print("  [", numero, "] ", jogador["nome"], sep="")
-
-    try:
-        escolha = int(input("Numero do atacante: "))
-    except ValueError:
-        print("Digite um numero.")
-        return
-
-    try:
-        atacante = ficha_player[escolha - 1]
-    except IndexError:
-        print("Opcao invalida.")
-        return
-
-    rolagem = dado(20)
-    bonus_agilidade = atacante["atributos"]["agilidade"]
-    teste = rolagem + bonus_agilidade
-    dano_arma = atacante["arma"]["dano"]
-    dano_força = atacante["atributos"]["força"]
-    dano_total = dano_arma + dano_força
-
-    print("\n" + "=" * 40)
-    print(atacante["nome"].upper(), "ATACA!")
-    print("=" * 40)
-    print("\n--- ROLAGEM DE ATAQUE ---")
-    print("D20:", rolagem)
-
-    print("Bonus de Agilidade: +", bonus_agilidade)
-    print("Total do teste:", teste)
-    print("\n--- DANO POTENCIAL ---")
-    print("Dano da arma (", atacante["arma"]["nome"], "):", dano_arma)
-    print("Bonus de Forca: +", dano_força)
-    print("Dano total:", dano_total)
-    input("\nPressione ENTER para continuar...")
-
-
-def rolagem_livre():
-    print("\n" + "=" * 40)
-    print("ROLAGEM LIVRE")
-    print("=" * 40)
-    print("\n--- ESCOLHA O PLAYER ---")
-    for numero, jogador in enumerate(ficha_player, start=1):
-        print("  [", numero, "] ", jogador["nome"], sep="")
-
-    try:
-        escolha = int(input("Numero do player: "))
-    except ValueError:
-        print("Digite um numero.")
-        return
-
-    try:
-        jogador = ficha_player[escolha - 1]
-    except IndexError:
-        print("Opcao invalida.")
-        return
-
-    print("\n--- ATRIBUTOS DISPONIVEIS ---")
-    lista_atributos = ["força", "agilidade", "inteligencia", "carisma"]
-    for i, atributo in enumerate(lista_atributos, start=1):
-        print(
-            "  [",
-            i,
-            "] ",
-            atributo.capitalize(),
-            " (valor: ",
-            jogador["atributos"][atributo],
-            ")",
-            sep="",
-        )
-    print("  [0] Cancelar")
-
-    try:
-        escolha_attr = int(input("Escolha o atributo: "))
-    except ValueError:
-        print("Digite um numero.")
-        return
-
-    if escolha_attr == 0:
-        return
-
-    try:
-        atributo_escolhido = lista_atributos[escolha_attr - 1]
-    except IndexError:
-        print("Opcao invalida.")
-        return
-
-    valor_atributo = jogador["atributos"][atributo_escolhido]
-    rolagem = dado(20)
-    resultado = rolagem + valor_atributo
-
-    print("\n" + "=" * 40)
-    print("TESTE DE", atributo_escolhido.upper())
-    print("=" * 40)
-    print("D20:", rolagem)
-    print("Bonus: +", valor_atributo)
-    print("Resultado:", resultado)
-    input("\nPressione ENTER para continuar...")
 
 
 # ========== MENUS ==========
@@ -1236,102 +452,66 @@ def menu_players():
             print("Opcao invalida.")
 
 
-def menu_itens():
-    while True:
-        print("\n=== MENU ITENS ===")
-        print("1 - Listar Itens")
-        print("2 - Adicionar Item")
-        print("3 - Remover Item")
-        print("0 - Voltar")
-        try:
-            opcao = int(input("Escolha: "))
-        except ValueError:
-            print("Digite um numero.")
-            continue
-        if opcao == 0:
-            break
-        elif opcao == 1:
-            listar_itens()
-        elif opcao == 2:
-            novo_item()
-        elif opcao == 3:
-            remover_item()
-        else:
-            print("Opcao invalida.")
 
 
-def menu_combate():
-    while True:
-        print("\n=== MENU COMBATE ===")
-
-        for numero, opcao in enumerate(menus_de_combate, start=1):
-            print(
-                "  [",
-                numero,
-                "] ",
-                opcao.__name__.replace("_", " ").capitalize(),
-                sep="",
-            )
-        try:
-            escolha = int(input("Escolha: "))
-        except ValueError:
-            print("Digite um numero.")
-            continue
-        if escolha == 0:
-            break
-
-        escolha = menus_de_combate[escolha - 1]()
 
 
-# menu principal do sistema
+        
 
 
+#menu principal do sistema
 def menu():
 
     while True:
 
         print("\n=== SISTEMA DE GERENCIAMENTO RPG ===")
 
-        print("\n" + "=" * 16)
+        print("\n" + "=" * 50)
         print("MENU PRINCIPAL")
-        print("=" * 16)
+        print("=" * 50)
 
         for numero, opcao in enumerate(menus, start=1):
             print(
-                "  [",
-                numero,
-                "] ",
+                "  [", numero, "] ",
                 opcao.__name__.replace("_", " ").capitalize(),
-                sep="",
+                sep=""
             )
 
+        print("  [0] Sair")
+
         try:
-            opçao = int(input("Escolha: "))
+            escolha = int(input("Escolha: "))
         except ValueError:
             print("Digite um numero.")
             continue
-        if opcao == 0:
-            print("Saindo...")
+
+        if escolha == 0:
+            print("Saindo do sistema...")
             break
 
-        escolha = menus[opçao - 1]()
+        try:
+            menus[escolha - 1]()
+        except IndexError:
+            print("Opção inválida.")
+
+    
 
 
-menus = [menu_players, novo_npc, menu_itens, menu_combate, menu_combate_cenarios]
 
-# ==== menu com as opçoes de combate ====
 
-menus_de_combate = [combate_com_alvo, combate_livre, rolagem_livre]
+# ===== lista com os menus do sistema =====
+menus = [menu_players,npcs.menu_npcs, itens.menu_itens, combates.menu_combate, cenarios.menu_cenarios]
 
+
+
+
+
+        
 # ==== lista com as opçoes de combate com cenarios ====
 
-menus_de_combate_com_cenarios = [
-    criar_cenario,
-    exibir_cenarios,
-    escolher_cenario,
-]
+
 
 # ========== EXECUTA ==========
+# entrar_cenario()
 
 menu()
-# teste
