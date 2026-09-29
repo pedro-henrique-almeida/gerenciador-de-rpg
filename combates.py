@@ -100,6 +100,8 @@ def ataque(atacante, alvo):
         else:
             print("Resposta invalida. Digite S, N ou 0.")
 
+        
+
 
 def menu_combate_cenarios():
 
@@ -145,45 +147,51 @@ def menu_combate_cenarios():
 
 
 
-def combate_com_alvo(participantes= lutadores):
+def combate_com_alvo(participantes):
 
     print("\n" + "=" * 50)
     print("INICIANDO COMBATE")
     print("=" * 50)
 
-    print("\n--- ESCOLHA O ATACANTE ---")
-    for numero, jogador in enumerate(participantes, start=1):
-        print("  [", numero, "] ", jogador["nome"], sep="")
 
-    try:
-        escolha_atacante = int(input("Numero do atacante: "))
-    except ValueError:
-        print("Digite um numero.")
-        return
-
-    try:
-        atacante = participantes[escolha_atacante - 1]
-    except IndexError:
-        print("Opcao invalida.")
-        return
-
-    print("\n--- ESCOLHA O ALVO ---")
-    for numero, criatura in enumerate(participantes, start=1):
-        print("  [",numero,"] ",criatura["nome"]," (Vida: ", criatura["vida"],")",sep="",)
-
-    try:
-        escolha_alvo = int(input("Numero do alvo: "))
-    except ValueError:
-        print("Digite um numero.")
-        return
-
-    try:
-        alvo = participantes[escolha_alvo - 1]
-    except IndexError:
-        print("Opcao invalida.")
-        return
 
     while True:
+
+        print("\n--- ESCOLHA O ATACANTE ---")
+        for numero, jogador in enumerate(participantes, start=1):
+            print("  [", numero, "] ", jogador["nome"], sep="")
+
+        try:
+            escolha_atacante = int(input("Numero do atacante: "))
+        except ValueError:
+            print("Digite um numero.")
+            return
+
+        try:
+            atacante = participantes[escolha_atacante - 1]
+        except IndexError:
+            print("Opcao invalida.")
+            return
+
+        print("\n--- ESCOLHA O ALVO ---")
+        for numero, criatura in enumerate(participantes, start=1):
+            print("  [",numero,"] ",criatura["nome"]," (Vida: ", criatura["vida"],")",sep="",)
+
+        try:
+            escolha_alvo = int(input("Numero do alvo: "))
+        except ValueError:
+            print("Digite um numero.")
+            return
+
+        try:
+            alvo = participantes[escolha_alvo - 1]
+        except IndexError:
+            print("Opcao invalida.")
+            return
+
+        
+
+    
 
         print("\n" + "-" * 40)
         print("VIDA ATUAL DO ALVO:", alvo["nome"], "=", alvo["vida"])
@@ -196,45 +204,19 @@ def combate_com_alvo(participantes= lutadores):
             print("COMBATE ENCERRADO")
             print("=" * 50)
             input("\nPressione ENTER para voltar ao menu...")
-            break
-
-        print("\n" + "-" * 40)
-        print("NOVO ATAQUE")
-        print("-" * 40)
-
-        print("--- ESCOLHA O ATACANTE ---")
-
-        for numero, jogador in enumerate(participantes, start=1):
-            print("  [", numero, "] ", jogador["nome"], sep="")
-
-        print("  [0] Encerrar combate")
-
-        try:
-            escolha = int(input("Numero do atacante (0 para encerrar): "))
-        except ValueError:
-            print("Digite um numero.")
-            continue
-
-        if escolha == 0:
-
-            print("\n" + "=" * 40)
-            print("Combate encerrado pelo mestre.")
-            print("=" * 40)
-
-            if alvo in inimigos:
-                alvo.vida = alvo.vida_maxima
-            else:
-                alvo["vida"] = alvo["vida_maxima"]
 
 
-            input("\nPressione ENTER para voltar ao menu...")
-            break
 
-        try:
-            atacante = participantes[escolha - 1]
-        except IndexError:
-            print("Opcao invalida. Tente novamente.")
-            continue
+            
+        
+
+    
+        
+
+
+
+    
+        
 
 
 def combate_livre():
